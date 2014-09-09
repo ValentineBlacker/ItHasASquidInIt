@@ -1,0 +1,4 @@
+title=It Has A Squid In It
+author=Valentine Blacker
+api=1
+orientation=landscape

@@ -248,8 +248,12 @@ class gamePlay(scene.Scene):
             focuspos = pygame.mouse.get_pos()
             diffx =  (self.squid.rect.center[0] - focuspos[0])
             diffy =   (self.squid.rect.center[1] - focuspos[1])
-            self.squid.dx = -diffx
-            self.squid.dy =- diffy
+            if abs(diffx) > 50:
+                self.squid.dx += -diffx* .1
+            else: self.squid.dx = 0
+            if abs(diffy) > 50:
+                self.squid.dy += -diffy* .1
+            else: self.squid.dy = 0
        
                         
     def accelerometer_controls(self):

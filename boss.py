@@ -6,7 +6,6 @@ Created on Aug 11, 2014
 import pygame
 import baddie
 
-bossDict = {1:[], 2:[]}
 
 class Boss(baddie.Baddie):
 
@@ -55,7 +54,7 @@ class Boss(baddie.Baddie):
         self.hit = False
         self.pause = 0
         self.frame = 0
-        self.hp = 25
+        self.hp = 40
         self.image_size = (700,700)
         self.number_of_frames = 8
         if self.scene.wave_number == 1:
@@ -74,7 +73,7 @@ class Boss(baddie.Baddie):
             self.rect.right = -20
         self.rect.bottom = self.scene.field_height
         
-        self.movement_length = 150
+        self.movement_length = 130
         self.movement_count = self.movement_length  
         
     

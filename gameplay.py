@@ -230,6 +230,8 @@ class gamePlay(scene.Scene):
         self.squid_controllable = True
         
     def if_boss_dead(self):
+        "if boss is killed, start next wave."
+        self.boss.shootable = False
         if self.boss.hp <= 0:
             self.boss.currentimage = self.boss.imgdead
             if self.boss.frame >= self.boss.number_of_frames-1:
@@ -239,25 +241,17 @@ class gamePlay(scene.Scene):
                 
     
     def mouse_controls(self):
+        """math to make squid follow cursor. speed increases slightly with distance. 
+        speed capped in squid class.        basically we determine where, on an imaginary circle around 
+        the squid, the cursor lies, and then move him based on that."""
         if self.squid_controllable == True:
-            posx = pygame.mouse.get_pos()[0]
-            posy = pygame.mouse.get_pos()[1]
-            if self.squid.dead == False:
-                if self.squid.rect.collidepoint(posx,posy) == False:
-                    if posx < self.squid.rect.x:               
-                        if posy  > self.squid.rect.top and posy < self.squid.rect.bottom :       
-                            self.squid.dx = self.squid.dx - .2     
-                    elif posx >  self.squid.rect.x:
-                        if posy  > self.squid.rect.top and posy < self.squid.rect.bottom:    
-                            self.squid.dx = self.squid.dx + .2   
-                    if posy < self.squid.rect.y:  
-                        if posx > self.squid.rect.left and posx < self.squid.rect.right:      
-                            self.squid.dy = self.squid.dy - .2      
-                    elif posy > self.squid.rect.y: 
-                        if posx > self.squid.rect.left and posx < self.squid.rect.right:   
-                            self.squid.dy = self.squid.dy + .2                    
-                
-            
+            focuspos = pygame.mouse.get_pos()
+            diffx =  (self.squid.rect.center[0] - focuspos[0])
+            diffy =   (self.squid.rect.center[1] - focuspos[1])
+            self.squid.dx = -diffx
+            self.squid.dy =- diffy
+       
+                        
     def accelerometer_controls(self):
         if self.squid_controllable == True and self.android:
                 self.squid.dx = self.accelerometer()[0]

@@ -49,10 +49,8 @@ class Powerup(baddie.Baddie):
                             (self.scene.foreground_map.tile_size_x*
                             self.scene.foreground_map.map_width)/4)
         if self.scene.scroll_to_left == True:
-            self.dx = - (self.scene.speed + (self.scene.speed_increase * 
-                                             self.scene.wave_number+1)) 
-        else: self.dx = self.scene.speed + (self.scene.speed_increase * 
-                                            self.scene.wave_number+1)
+            self.dx = - (self.scene.speed + self.scene.wave_number+2)
+        else: self.dx = (self.scene.speed + self.scene.wave_number+2)
                         
         self.power_dict = {0: 'blue',
                            1: 'red',

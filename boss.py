@@ -54,11 +54,9 @@ class Boss(baddie.Baddie):
         self.hit = False
         self.pause = 0
         self.frame = 0
-        self.hp = 40
+        self.hp = (self.scene.wave_number*5)+ 20
         self.image_size = (700,700)
-        self.number_of_frames = 8
-        if self.scene.wave_number == 1:
-            self.number_of_frames = 1
+        self.number_of_frames = 8        
         self.load_images()        
         self.image = self.imgstand
        
@@ -85,28 +83,34 @@ class Boss(baddie.Baddie):
             return self.scene.speed*2
         else: return 0
        
-        
+    def die(self):
+        """if curent image is dead, moves self offscreen after animation plays."""
+        if self.frame >= self.number_of_frames-1:
+            self.rect.x = -1000
+                
     def update(self):
+        if self.currentimage == self.imgdead:
+            self.die()
         if self.scene.foreground_map.at_end == True:
             
             if self.scene.scroll_to_left == True and self.rect.right > self.scene.field_length:
                 self.dx = -self.scene.speed
             elif self.scene.scroll_to_left == False and self.rect.left < 0:
                 self.dx = self.scene.speed
-            else: 
+            elif self.currentimage is not self.imgdead: 
                 self.dx = self.movement()
                 self.shootable = True
                 if self.movement_count< -self.movement_length :
                     self.movement_count = self.movement_length
                 self.movement_count -=1
-                
+                            
             self.rect.x += self.dx
             #the order here is important or the collidemask won't work for the flipped sprite
             self.animation()
             if self.scene.scroll_to_left :
                 self.flip()
             self.mask = pygame.mask.from_surface(self.image)
-            if self.hit == True:
+            if self.hit == True and self.shootable == True:
                 self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 2) 
                 self.hit = False
             else: self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)

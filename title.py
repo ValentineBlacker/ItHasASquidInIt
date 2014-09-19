@@ -20,7 +20,7 @@ class Title(scene.Scene):
         self.squid.currentimage = self.squid.imgtitle
         self.squid.dy = 0
         self.squid.delay = 12
-        self.squid.number_of_frames = 5
+        self.squid.number_of_frames = 9
         self.label = label.Label(self)
         self.label.textlines = ["it has a squid in it"]
         self.menu = label.Label(self, font_size = 50)
@@ -34,38 +34,23 @@ class Title(scene.Scene):
         self.background.fill(pygame.color.Color("black"))
         self.screen.blit(self.background, (0, 0))
         self.sprites = [self.label, self.menu,self.squid]
-        self.squid.number_of_frames = 9
+        self.click_sound = pygame.mixer.Sound('sounds/157539__nenadsimic__click.wav')
         
+        
+    def mouse_controls(self):
+        "make squid follow cursor"
+        focuspos = pygame.mouse.get_pos()
+        diffx =  (self.squid.rect.center[0] - focuspos[0])
+        if abs(diffx) > 50:
+            self.squid.dx += -diffx* .1
+        else: self.squid.dx = 0
+           
     
     def start_game(self):
-        from gameplay import gamePlay
-        self.nextlevel = gamePlay()
+        from cutscene import Cutscene0
+        self.nextlevel = Cutscene0()
         self.level_transition()
-                                 
-    def keyboard_controls(self, event):
-        """Enter or click starts game. Arrows move squid back and forth."""
-        if event.key == pygame.K_RETURN :
-            self.start_game()
-        if event.key == pygame.K_LEFT: 
-            self.squid.dx = self.squid.dx - 1 
-        if event.key == pygame.K_RIGHT:
-            self.squid.dx = self.squid.dx +1
-            
-    def mouse_controls(self):
-        if self.clicked ==True:
-            if self.menu.option_highlighted == 0:
-                self.start_game()
-        posx = pygame.mouse.get_pos()[0]
-        posy = pygame.mouse.get_pos()[1]
-        if self.time % 6 == 0:
-            if posx < self.squid.rect.x:               
-                if posy  > self.squid.rect.top and posy < self.squid.rect.bottom :       
-                    self.squid.dx = self.squid.dx - 1         
-                    return 'left'
-            elif posx >  self.squid.rect.x:
-                if posy  > self.squid.rect.top and posy < self.squid.rect.bottom:    
-                    self.squid.dx = self.squid.dx + 1 
-    
+       
     def fill_background(self):
         self.screen.blit(self.background, (0, 0))
                 
@@ -82,7 +67,11 @@ class Title(scene.Scene):
             if self.squid.dx < 0:
                 self.squid.dx = 0
             else: pass
-        self.squid.dy = 0
+       
+        if self.clicked ==True:
+            if self.menu.option_highlighted == 0:
+                self.click_sound.play()
+                self.start_game()
         
         
     

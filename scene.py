@@ -31,6 +31,7 @@ class Scene(object):
         
         self.MASTER_SPEED = 3
         self.tick_speed = 35
+        pygame.mixer.init()
         
         resolution = (1280, 768)
         self.screen = pygame.display.set_mode(resolution)
@@ -53,8 +54,8 @@ class Scene(object):
         self.groups = []
         self.init_variables()
         self.init_objects()   
-        
         self.clicked = False
+        
      
     def accelerometer(self):
         accelerometer = android.accelerometer_reading()
@@ -140,12 +141,9 @@ class Scene(object):
     
     def mouse_controls(self):
         pass
-    
-    def keyboard_controls(self,event):
-        pass
-            
+  
     def handle_events(self):
-        """events- mouse click, escape to exit game. squid controlled by keyboard if not android"""
+        """events- mouse click, escape to exit game. squid controlled by mouse if not android"""
         for event in pygame.event.get():      
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.vibrate(.1)
@@ -153,9 +151,7 @@ class Scene(object):
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.clicked = False
             if event.type == pygame.KEYUP:
-                if not android:    
-                    self.keyboard_controls(event)     
-                if event.key == pygame.K_ESCAPE:
+                if event.key == pygame.K_ESCAPE or event.type == pygame.QUIT:
                         pygame.quit() 
                         if not android: 
                             sys.exit(0) 

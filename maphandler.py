@@ -47,7 +47,8 @@ class ScrollingMap:
         elif self.maptype == 'splash':
             self.speed = 0
             self.tileset = pygame.image.load\
-                            ("images/maps/titlemap.png").convert_alpha()      
+                           ("images/maps/cutscene{0}.png".format 
+                            (self.scene.wave_number)).convert_alpha()        
             
         self.tile_size = self.tileset.get_size()    
         self.tile_size_x = self.tile_size[0]

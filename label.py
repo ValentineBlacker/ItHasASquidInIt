@@ -93,8 +93,7 @@ class Label(pygame.sprite.DirtySprite):
                 #center the text
                 xpos = (self.image.get_width() - fontsurface.get_width())/2
                 yPos = (linenum * vSize)            
-                self.image.blit(fontsurface, (xpos, yPos), special_flags= 0)    
-            
+                self.image.blit(fontsurface, (xpos, yPos), special_flags= 0)  
             self.scene.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
             
             

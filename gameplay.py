@@ -17,7 +17,7 @@ import maphandler
 import label
 
 #TODO:
-#CUTSCENES
+
 
 class gamePlay(scene.Scene):
     def init_variables(self):
@@ -25,11 +25,10 @@ class gamePlay(scene.Scene):
         self.speed = self.MASTER_SPEED
         self.scroll_to_left = True
         self.number_of_baddies = 50
-        self.number_of_baddies_used = 10
+        self.number_of_baddies_used = 30
         self.number_of_powerups = 5
         self.number_of_bullets = 30
         self.wave_number = 0
-        self.speed_increase = self.speed /(self.speed)
         #the shooting speed number is the delay between bullets. a LOWER number means the bullets fire faster.
         self.shooting_speed = self.speed * 10
         self.default_shooting_speed = self.shooting_speed
@@ -42,13 +41,17 @@ class gamePlay(scene.Scene):
         self.bullettimer = 20
         self.bullet_powerup_timer = 0
         self.bullet_order = 0
-        self.title_time = self.time        
-        self.next_level = None
+        self.title_time = self.time      
         self.hudrect = pygame.rect.Rect(10,10,100,40)
-        self.squid_controllable = True
-                
+        self.boss_dead = False
+        self.squid_controllable = False
+                             
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
+        
+        self.baddie_damage_sound = pygame.mixer.Sound('sounds/34172__glaneur-de-sons__woosh-02.wav')
+        self.squid_damage_sound = pygame.mixer.Sound('sounds/92736__robinhood76__01522-swoosh-1.wav')
+        self.powerup_sound = pygame.mixer.Sound('sounds/174462__yottasounds__power-up-001.wav')
         
         self.squid = squid.Squid(self)
         
@@ -117,6 +120,7 @@ class gamePlay(scene.Scene):
         self.squid.dx = self.squid.dy = 0
         if self.shield_counter <= 0 :
             self.life = self.life - 1
+            self.squid_damage_sound.play()
             if self.life> -1:
                 self.lifedots[self.life].kill()
             self.shooting_speed = self.default_shooting_speed
@@ -127,7 +131,8 @@ class gamePlay(scene.Scene):
         "detects collision between squid and powerup"
         collidedpowerup = pygame.sprite.spritecollideany(self.squid, self.powerupGroup)
         if collidedpowerup:
-            if self.collisiontimer < 0:    
+            if self.collisiontimer < 0:   
+                self.powerup_sound.play() 
                 self.vibrate(.2)
                 self.collisiontimer = 5
                 if collidedpowerup.color == 'blue':  
@@ -155,7 +160,7 @@ class gamePlay(scene.Scene):
     def squid_killed(self): 
         "when main character dies, kill it and display continue menu."
         self.squid.dx = 0
-        self.squid.dy = -.5
+        self.squid.dy = -1
         self.squid.dead = True 
         self.label.toggle_visible(True)
         self.label.textlines = ["it HAD a squid in it"]
@@ -183,16 +188,32 @@ class gamePlay(scene.Scene):
         """checks to see if bullet has llided with an enemy. Sets enemy to dead."""
         for b in self.bullets:
             collidedbaddie = pygame.sprite.spritecollideany(b,self.baddieGroup)
-            if collidedbaddie:       
-                if collidedbaddie.check_bounds() == True and collidedbaddie.currentimage is not collidedbaddie.imgdead:
-                    self.vibrate(.1) 
-                    collidedbaddie.frame = 0
-                    collidedbaddie.currentimage = collidedbaddie.imgdead
-                    self.increment_score('baddie')
-                    if self.shooting_speed > self.powerup_shooting_speed:
-                        self.shooting_speed = self.shooting_speed - self.shooting_speed/20
-                    else: pass
-                b.reset()
+            if collidedbaddie:   
+                if collidedbaddie.currentimage is not collidedbaddie.imgdead: 
+                    self.kill_baddie(collidedbaddie)  
+                    self.check_for_combo(collidedbaddie.rect)
+                    b.reset()
+                    
+    def check_for_combo(self, collidedrect):
+        combo_rect = collidedrect.inflate(200,75)
+        for b in self.baddies :
+            if combo_rect.colliderect(b.rect):
+                if b.currentimage is not b.imgdead:
+                    self.kill_baddie(b)
+                    #this is a score bonus
+                    self.increment_score('badde')
+                    #self.check_for_combo(b.rect)
+                    
+    def kill_baddie(self, baddie):
+        if baddie.check_bounds() == True:
+            self.vibrate(.1) 
+            self.baddie_damage_sound.play()
+            baddie.frame = 0
+            baddie.currentimage = baddie.imgdead
+            self.increment_score('baddie')
+            if self.shooting_speed > self.powerup_shooting_speed:
+                self.shooting_speed = self.shooting_speed - self.shooting_speed/20
+            else: pass
     
     def bullet_boss_collision(self):
         """checks to see if bullet has collided with a boss. """
@@ -203,14 +224,15 @@ class gamePlay(scene.Scene):
                 self.boss.hit = True 
                 self.vibrate(.1) 
                 b.reset()
-                if self.boss.hp == 0:
-                    self.boss.frame = 0
+                if self.boss.hp <= 0:
+                    self.if_boss_dead()
     
     def increment_score(self, enemy_type):
         if enemy_type == 'baddie':
             self.score += 10
         elif enemy_type == 'boss':
             self.score += 50
+        
         self.scorelabel.image.fill(self.scorelabel.fillcolor)
         self.scorelabel.textlines =[' %0*d' % (5, self.score)]
     
@@ -218,6 +240,7 @@ class gamePlay(scene.Scene):
         self.wave_number = wave_number
         self.label.toggle_visible(True)
         self.squid.dead = False
+        self.boss_dead = False
         self.title_counter = 50
         self.number_of_baddies_used += 5
         self.title_time = self.time 
@@ -232,18 +255,31 @@ class gamePlay(scene.Scene):
     def if_boss_dead(self):
         "if boss is killed, start next wave."
         self.boss.shootable = False
-        if self.boss.hp <= 0:
-            self.boss.currentimage = self.boss.imgdead
-            if self.boss.frame >= self.boss.number_of_frames-1:
-                if self.wave_number <= 0:
-                    self.new_wave(self.wave_number+1)
-                else: self.quit_to_title()
-                
+        self.boss.frame = 0
+        self.boss.currentimage = self.boss.imgdead
+        for b in self.baddies:
+            b.currentimage = b.imgdead
+        self.boss_dead = True
+        
+        
+    def end_wave(self):
+        self.squid_controllable = False
+        if self.scroll_to_left:
+            self.squid.dx = self.speed*2
+        else: self.squid.dx = -self.speed*2
+        self.squid.dy = 1
+        if self.squid.rect.x > self.field_length or self.squid.rect.x <0 :
+            if self.wave_number <= 0:
+                self.new_wave(self.wave_number+1)
+            else: self.quit_to_title()            
+                        
+    def accelerometer_controls(self):
+        if self.squid_controllable == True and self.android:
+                self.squid.dx = self.accelerometer()[0]
+                self.squid.dy = self.accelerometer()[1]
     
     def mouse_controls(self):
-        """math to make squid follow cursor. speed increases slightly with distance. 
-        speed capped in squid class.        basically we determine where, on an imaginary circle around 
-        the squid, the cursor lies, and then move him based on that."""
+        "make squid follow cursor"
         if self.squid_controllable == True:
             focuspos = pygame.mouse.get_pos()
             diffx =  (self.squid.rect.center[0] - focuspos[0])
@@ -254,12 +290,7 @@ class gamePlay(scene.Scene):
             if abs(diffy) > 50:
                 self.squid.dy += -diffy* .1
             else: self.squid.dy = 0
-       
-                        
-    def accelerometer_controls(self):
-        if self.squid_controllable == True and self.android:
-                self.squid.dx = self.accelerometer()[0]
-                self.squid.dy = self.accelerometer()[1]
+        else: pass
     
     def handle_dead_menu(self):
         key_pressed =  pygame.key.get_pressed()
@@ -276,30 +307,15 @@ class gamePlay(scene.Scene):
         else: pass
             
     def quit_to_title(self):
-            import title
-            self.nextlevel = title.Title()       
-            self.level_transition()
-    
-    def keyboard_controls(self, event):
-        if self.squid_controllable == True:
-            if event.key == pygame.K_UP:
-                self.squid.dy = self.squid.dy - 1
-            if event.key == pygame.K_DOWN:
-                self.squid.dy = self.squid.dy + 1   
-            if event.key == pygame.K_RIGHT:            
-                self.squid.dx = self.squid.dx + 1 
-            if event.key == pygame.K_LEFT:
-                self.squid.dx = self.squid.dx - 1
-        else: 
-            if  event.key == pygame.K_UP :
-                self.continuelabel.option_highlighted = 0
-            elif event.key == pygame.K_DOWN:
-                self.continuelabel.option_highlighted = 1
+        import cutscene
+        self.nextlevel = cutscene.Cutscene1()       
+        self.level_transition()
+
             
            
     def update(self): 
         """things that need to be updated in individual scenes""" 
-        #rethink timers
+       
         self.collisiontimer -=1
         self.shield_counter -= 1
         #draw the little rectangle around the lifedots
@@ -313,16 +329,18 @@ class gamePlay(scene.Scene):
         self.bullettimer -= 1  
         self.bullet_powerup_timer -=1
         
-        if self.title_time <  self.time - 100 :
+        if self.title_time ==  self.time - 100 :
             self.label.toggle_visible(False)
             self.label.text = " "
+            self.squid_controllable = True
             
         if self.boss.check_bounds() == True and self.boss.shootable == True:
             self.detect_boss_collision() 
             self.bullet_boss_collision()
-            self.if_boss_dead()
         if self.squid.dead == True: 
             self.handle_dead_menu()
+        if self.boss_dead == True:
+            self.end_wave()
         
         
         

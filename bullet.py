@@ -22,7 +22,7 @@ class Bullet(pygame.sprite.DirtySprite):
         
         self.dx = 0
         self.dy = 0
-        self.speed = scene.speed* 2
+        self.speed = scene.speed* 3
                
         self.dirty = 2  
         self.pause = 0

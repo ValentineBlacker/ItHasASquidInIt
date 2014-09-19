@@ -109,6 +109,15 @@ class Squid(pygame.sprite.DirtySprite):
         reversetitle = temptitle[::-1]
         self.imgtitle = temptitle + reversetitle
         
+        #walking animation for cutscene
+        self.imgsquidge= []
+        offsetsquidge = tuple((self.imgsize[0]*i,self.imgsize[1]*3) 
+                             for i in xrange(5))
+        for i in xrange(len(offsetsquidge)):
+            tmpimg = pygame.Surface(self.imgsize, pygame.SRCALPHA)
+            tmpimg.blit(imagemaster, (0, 0), (offsetsquidge[i], self.imgsize))            
+            self.imgsquidge.append(tmpimg)
+        
        
     def enforce_speed_limit(self):    
         if abs(self.dx) > self.maxspeed:
@@ -149,7 +158,7 @@ class Squid(pygame.sprite.DirtySprite):
                        
         if self.dead == True:
             self.image = self.imgdead 
-          
+            
         elif self.scene.collisiontimer > 0 and self.currentimage is not self.imgshield:
             self.image = self.imgdamage
         else:
@@ -158,13 +167,9 @@ class Squid(pygame.sprite.DirtySprite):
             if self.scene.shield_counter > 0:     
                 self.currentimage = self.imgshield                
             else: self.currentimage = self.imgmoving
-        
-        if self.scene.scroll_to_left == True:
-            self.flip()
+                
         self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)  
             
-    
-        
     def check_bounds(self):    
         #Check Bounds. right now just stops at screen edge && baseline
         screenwidth = self.scene.field_length
@@ -180,8 +185,8 @@ class Squid(pygame.sprite.DirtySprite):
         if self.rect.y >screenheight:            
             self.rect.y = screenheight
 
-        if self.rect.y < 50:
-            self.rect.y = 50
+        if self.rect.y < 0:
+            self.rect.y = 0
 
     def flip(self):
     

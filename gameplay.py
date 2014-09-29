@@ -24,11 +24,11 @@ class gamePlay(scene.Scene):
         """ init all variables needed in scene"""
         self.speed = self.MASTER_SPEED
         self.scroll_to_left = True
-        self.number_of_baddies = 50
-        self.number_of_baddies_used = 30
+        self.number_of_baddies = 100
+        #self.number_of_baddies_used = 30
         self.number_of_powerups = 5
         self.number_of_bullets = 30
-        self.wave_number = 0
+        self.wave_number = 1
         #the shooting speed number is the delay between bullets. a LOWER number means the bullets fire faster.
         self.shooting_speed = self.speed * 10
         self.default_shooting_speed = self.shooting_speed
@@ -59,7 +59,7 @@ class gamePlay(scene.Scene):
         self.foreground_map = maphandler.ScrollingMap(self, 'foreground')
         self.maps = [self.background_map, self.foreground_map]  
         
-        self.baddies = [baddie.Baddie(self, n) for n in xrange(self.number_of_baddies)]           
+        self.baddies = [baddie.Baddie(self) for n in xrange(self.number_of_baddies)]           
         self.baddieGroup = self.make_sprite_group(self.baddies)
         self.add_group(self.baddieGroup)        
         self.powerups = [powerup.Powerup(self) for n in xrange(self.number_of_powerups)]
@@ -98,7 +98,7 @@ class gamePlay(scene.Scene):
         self.boss = boss.Boss(self)
         
               
-        self.sprites = [self.background_map, self.foreground_map, self.squid, self.baddieGroup, self.boss, 
+        self.sprites = [self.background_map, self.foreground_map, self.squid, self.boss, self.baddieGroup,  
                         self.powerupGroup, self.bulletGroup, self.lifeGroup, self.label, self.scorelabel,self.continuelabel]  
         
         
@@ -188,32 +188,35 @@ class gamePlay(scene.Scene):
         """checks to see if bullet has llided with an enemy. Sets enemy to dead."""
         for b in self.bullets:
             collidedbaddie = pygame.sprite.spritecollideany(b,self.baddieGroup)
-            if collidedbaddie:   
-                if collidedbaddie.currentimage is not collidedbaddie.imgdead: 
-                    self.kill_baddie(collidedbaddie)  
+            if collidedbaddie and collidedbaddie.check_bounds() == True\
+             and collidedbaddie.currentimage is not collidedbaddie.imgdead:   
+                collidedbaddie.hp -= 1  
+                self.vibrate(.1) 
+                self.baddie_damage_sound.play()
+                self.increment_score('baddie')
+                b.reset()
+                if collidedbaddie.hp <= 0:
+                    self.kill_baddie(collidedbaddie)
                     self.check_for_combo(collidedbaddie.rect)
-                    b.reset()
-                    
+                                  
     def check_for_combo(self, collidedrect):
-        combo_rect = collidedrect.inflate(200,75)
-        for b in self.baddies :
-            if combo_rect.colliderect(b.rect):
-                if b.currentimage is not b.imgdead:
-                    self.kill_baddie(b)
-                    #this is a score bonus
-                    self.increment_score('badde')
-                    #self.check_for_combo(b.rect)
-                    
+        """kills other enemies in horizontal proximity to killed enemy"""
+        combo_rect = collidedrect.inflate(20,200)
+        for b in self.baddies: 
+            if b.check_bounds() == True :
+                if combo_rect.colliderect(b.rect):
+                    if b.currentimage is not b.imgdead:
+                        self.kill_baddie(b)
+                        #this is a score bonus
+                        self.increment_score('baddie')
+                       
     def kill_baddie(self, baddie):
-        if baddie.check_bounds() == True:
-            self.vibrate(.1) 
-            self.baddie_damage_sound.play()
-            baddie.frame = 0
-            baddie.currentimage = baddie.imgdead
-            self.increment_score('baddie')
-            if self.shooting_speed > self.powerup_shooting_speed:
-                self.shooting_speed = self.shooting_speed - self.shooting_speed/20
-            else: pass
+        """called when baddie HP is 0"""
+        baddie.frame = 0
+        baddie.currentimage = baddie.imgdead
+        if self.shooting_speed > self.powerup_shooting_speed:
+            self.shooting_speed = self.shooting_speed - self.shooting_speed/20
+        else: pass
     
     def bullet_boss_collision(self):
         """checks to see if bullet has collided with a boss. """
@@ -228,6 +231,7 @@ class gamePlay(scene.Scene):
                     self.if_boss_dead()
     
     def increment_score(self, enemy_type):
+        """raises score, refreshes score box"""
         if enemy_type == 'baddie':
             self.score += 10
         elif enemy_type == 'boss':
@@ -237,12 +241,12 @@ class gamePlay(scene.Scene):
         self.scorelabel.textlines =[' %0*d' % (5, self.score)]
     
     def new_wave(self, wave_number):   
+        """resets everything between waves"""
         self.wave_number = wave_number
         self.label.toggle_visible(True)
         self.squid.dead = False
         self.boss_dead = False
         self.title_counter = 50
-        self.number_of_baddies_used += 5
         self.title_time = self.time 
         self.label.textlines = ["sphere {0}".format(self.label.int_to_roman[self.wave_number])]
         resetlist = self.maps + self.baddies + self.powerups + self.bullets
@@ -263,6 +267,7 @@ class gamePlay(scene.Scene):
         
         
     def end_wave(self):
+        """ends current wave"""
         self.squid_controllable = False
         if self.scroll_to_left:
             self.squid.dx = self.speed*2
@@ -293,6 +298,7 @@ class gamePlay(scene.Scene):
         else: pass
     
     def handle_dead_menu(self):
+        """called if player runs out of lives"""
         key_pressed =  pygame.key.get_pressed()
         if self.clicked == True or key_pressed[pygame.K_RETURN]:
             if self.continuelabel.option_highlighted == 0:
@@ -329,7 +335,7 @@ class gamePlay(scene.Scene):
         self.bullettimer -= 1  
         self.bullet_powerup_timer -=1
         
-        if self.title_time ==  self.time - 100 :
+        if self.title_time <  self.time - 100 :
             self.label.toggle_visible(False)
             self.label.text = " "
             self.squid_controllable = True

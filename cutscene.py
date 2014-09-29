@@ -38,7 +38,7 @@ class Cutscene0(scene.Scene):
         self.ocean_noises.play()
         self.seagull_noises.play()
         
-        self.tutorial = label.Label(self, size = (800,200), location = (800,150), font_size = 20)
+        self.tutorial = label.Label(self, size = (800,150), location = (800,150), font_size = 20)
         if self.android:
             self.tutorialtext = [['line one', 'line one one'], ['line two', 'line two two']]
             
@@ -94,8 +94,8 @@ class Cutscene0(scene.Scene):
                 self.click_counter = 30   
                 self.linecounter += 1                 
                 if self.linecounter == len(self.tutorialtext):
-                    self.ocean_noises.fadeout()
-                    self.seagull_noises.fadeout()
+                    self.ocean_noises.fadeout(1000)
+                    self.seagull_noises.fadeout(1000)
                     self.start_game()
                 else:
                     self.tutorial.image.fill(self.tutorial.fillcolor)
@@ -107,7 +107,7 @@ class Cutscene1(scene.Scene):
         """ creates objects needed in specfic scenes"""
         self.speed = self.MASTER_SPEED
        
-        self.label = label.Label(self)
+        self.label = label.Label(self, font_size = 50)
         self.label.textlines = ["THANK YOU FOR PLAYING", "IT HAS A SQUID IN IT"]
         self.menu = label.Label(self, font_size = 50)
         if self.android:
@@ -147,7 +147,7 @@ class Cutscene1(scene.Scene):
     
         
 def main():
-    game = Cutscene0()
+    game = Cutscene1()
     game.start()
 if __name__ == "__main__":
     main()

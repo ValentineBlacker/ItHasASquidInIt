@@ -54,9 +54,9 @@ class Squid(pygame.sprite.DirtySprite):
              
         self.dead = False
         self.position = self.rect.center
-        self.dy = 1
+        self.dy = 3
         if self.scene.scroll_to_left == True:
-            self.dx = .5
+            self.dx = 1
         
         
     def load_images(self):

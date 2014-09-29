@@ -10,20 +10,25 @@ import squid
 
 
 
-imgsize = (75,75)
+#imgsize = (75,75)
 number_of_frames = 4
+
+type_1 = (75,75)
+type_2 = (100,100)
+type_3 = (150,50)
 
 
 class Baddie(squid.Squid):
 
-    def __init__(self, scene, id):
+    def __init__(self, scene):
         """ intialize sprite class """
         pygame.sprite.DirtySprite.__init__(self)
         self.scene = scene
         self.screen = scene.screen   
        
         self.wave_dict = {0 : ['l_fish','b_fish','q_fish'], 
-                          1: ['mothfish', 'ecto']
+                          1: ['mothfish', 'ecto', 'strix'],
+                          2: ['strix']
                           }
         #default sprite attributes
         self.sinpause = 0     
@@ -39,9 +44,7 @@ class Baddie(squid.Squid):
         self.imgmaster= pygame.image.load("images/baddies/{0}.png".format
                                            (self.name))        
         self.imgmaster = self.imgmaster.convert_alpha()
-        #self.imgmasterdead = pygame.image.load("images/baddies/dead.png") 
-        #self.imgmasterdead = self.imgmasterdead.convert_alpha()
-        
+    
         #intial placeholder image
         self.imgstand = pygame.Surface(self.image_size, pygame.SRCALPHA)        
         self.imgstand.blit(self.imgmaster, (0, 0), ((0,0), self.image_size))       
@@ -66,7 +69,7 @@ class Baddie(squid.Squid):
             self.imgdead.append(tmpimg)
                
     def check_bounds(self):  
-        """checks if sprite is visible"""
+        """returns TRUE if sprite is visible"""
         if self.rect.x > self.screen.get_width() or self.rect.x < 0:   
             return False
         else:
@@ -124,19 +127,18 @@ class Baddie(squid.Squid):
     def reset(self):
         """"calls when object created and at start of each wave.
         object can change appearance and properties."""
-        
-        if self.id <= self.scene.number_of_baddies_used:
-            if self.scene.scroll_to_left == True:
+
+        if self.scene.scroll_to_left == True:
                 self.dx = - (self.scene.speed + self.scene.wave_number+2) 
-            else: self.dx = (self.scene.speed + self.scene.wave_number+2) 
-        else: self.dx = 0
+        else: self.dx = (self.scene.speed + self.scene.wave_number+2)
         self.dy = 0
         self.determine_movement() 
         self.frame = random.randrange(0,3)
         self.dead = False
         self.name = random.choice(self.wave_dict[self.scene.wave_number])
-        self.image_size = imgsize
+        self.image_size = type_1
         self.number_of_frames = number_of_frames
+        self.hp = 1
         self.load_images()        
         self.image = self.imgstand
         self.currentimage = self.imgmoving
@@ -147,7 +149,8 @@ class Baddie(squid.Squid):
             self.rect.x =  self.scene.field_length  +1
         else: 
             self.rect.centerx = -1
-        self.rect.centery = random.randrange(self.size[0],(self.screen.get_height()-self.size[1]))
+        self.rect.centery = random.randrange(self.size[0],
+                                             (self.screen.get_height()-self.size[1]))
         self.startmovement = random.randrange\
-                            (0,(self.scene.foreground_map.tile_size_x*
-                            self.scene.foreground_map.map_width)/4)
+                            (0,(self.scene.field_length/2)- (self.scene.wave_number* 50))
+        

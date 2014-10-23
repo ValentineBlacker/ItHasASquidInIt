@@ -111,6 +111,7 @@ class Boss(baddie.Baddie):
                 self.flip()
             self.mask = pygame.mask.from_surface(self.image)
             if self.hit == True and self.shootable == True:
+                self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
                 self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 2) 
                 self.hit = False
             else: self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)

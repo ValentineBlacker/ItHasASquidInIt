@@ -171,7 +171,7 @@ class Squid(pygame.sprite.DirtySprite):
         self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)  
             
     def check_bounds(self):    
-        #Check Bounds. right now just stops at screen edge && baseline
+        #Check Bounds. 
         screenwidth = self.scene.field_length
         screenheight = self.scene.field_height - self.size[0]
            

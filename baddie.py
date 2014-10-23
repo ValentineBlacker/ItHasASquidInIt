@@ -28,7 +28,8 @@ class Baddie(squid.Squid):
        
         self.wave_dict = {0 : ['l_fish','b_fish','q_fish'], 
                           1: ['mothfish', 'ecto', 'strix'],
-                          2: ['strix']
+                          2: ['spidy'],
+                          3: ['spidy']
                           }
         #default sprite attributes
         self.sinpause = 0     
@@ -91,8 +92,11 @@ class Baddie(squid.Squid):
             if self.scene.scroll_to_left == True:
                 self.flip()
             if self.check_bounds() == True:
-                self.screen.blit(self.image, (self.rect.x, self.rect.y), 
-                                 special_flags= 0)  
+                if self.hit == True :
+                    self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
+                    self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 2) 
+                    self.hit = False
+                else: self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
             
                
     def die(self):
@@ -129,8 +133,8 @@ class Baddie(squid.Squid):
         object can change appearance and properties."""
 
         if self.scene.scroll_to_left == True:
-                self.dx = - (self.scene.speed + self.scene.wave_number+2) 
-        else: self.dx = (self.scene.speed + self.scene.wave_number+2)
+                self.dx = - (self.scene.speed + self.scene.wave_number+5) 
+        else: self.dx = (self.scene.speed + self.scene.wave_number+5)
         self.dy = 0
         self.determine_movement() 
         self.frame = random.randrange(0,3)
@@ -145,6 +149,7 @@ class Baddie(squid.Squid):
         self.rect = self.image.get_rect()     
         self.rect.inflate_ip(-5, -5)    
         self.size = self.image.get_size()
+        self.hit = False
         if self.scene.scroll_to_left :
             self.rect.x =  self.scene.field_length  +1
         else: 
@@ -152,5 +157,6 @@ class Baddie(squid.Squid):
         self.rect.centery = random.randrange(self.size[0],
                                              (self.screen.get_height()-self.size[1]))
         self.startmovement = random.randrange\
-                            (0,(self.scene.field_length/2)- (self.scene.wave_number* 50))
-        
+                            (0,(self.scene.field_length)- (self.scene.wave_number* 60))\
+                            
+       

@@ -9,6 +9,11 @@ import squid
 import label
 
 class Title(scene.Scene):
+    
+    def __init__(self):        
+        scene.Scene.__init__(self)
+        self.next = "INTRO"
+    
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
         self.speed = self.MASTER_SPEED
@@ -37,6 +42,13 @@ class Title(scene.Scene):
         self.click_sound = pygame.mixer.Sound('sounds/157539__nenadsimic__click.wav')
         
         
+    def startup(self, time, persistant):
+        self.init_objects()
+        return scene.Scene.startup(self, time, persistant)
+    
+    def cleanup(self):        
+        return scene.Scene.cleanup(self)
+        
     def mouse_controls(self):
         "make squid follow cursor"
         focuspos = pygame.mouse.get_pos()
@@ -44,18 +56,14 @@ class Title(scene.Scene):
         if abs(diffx) > 50:
             self.squid.dx += -diffx* .1
         else: self.squid.dx = 0
-           
+          
     
-    def start_game(self):
-        from cutscene import Cutscene0
-        self.nextlevel = Cutscene0()
-        self.level_transition()
-       
     def fill_background(self):
         self.screen.blit(self.background, (0, 0))
-                
-    def update(self):       
-        """update title screen""" 
+        
+                    
+    def update_specifics(self):       
+        """update title screen"""         
         self.squid.currentimage = self.squid.imgtitle    
         if self.android:
             self.squid.dx = self.accelerometer()[0]
@@ -67,17 +75,26 @@ class Title(scene.Scene):
             if self.squid.dx < 0:
                 self.squid.dx = 0
             else: pass
-       
+        
         if self.clicked ==True:
             if self.menu.option_highlighted == 0:
                 self.click_sound.play()
-                self.start_game()
+                self.done = True
         
         
     
 def main():
-    game = Title()
-    game.start()
+    import gameplay
+    import cutscene
+    run_it = scene.Control()
+    state_dict = {"TITLE" : Title(),
+                  "INTRO" : cutscene.Cutscene0(),
+                  "GAMEPLAY" : gameplay.gamePlay(),
+                  "ENDING": cutscene.Cutscene1()
+                   }
+    run_it.setup_states(state_dict, "TITLE")
+    run_it.main()   
+    
 if __name__ == "__main__":
     main()
         

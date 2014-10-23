@@ -11,6 +11,11 @@ import maphandler
 import squid
 
 class Cutscene0(scene.Scene):
+    
+    def __init__(self):        
+        scene.Scene.__init__(self)
+        self.next = "GAMEPLAY"
+    
     def init_variables(self):
         """ init all variables needed in scene"""
         self.speed = self.MASTER_SPEED
@@ -35,21 +40,30 @@ class Cutscene0(scene.Scene):
         
         self.ocean_noises =  pygame.mixer.Sound('sounds/31762__slanesh__ocean.wav')
         self.seagull_noises =  pygame.mixer.Sound('sounds/144836__eelke__sea-seagulls-crows-windfilter.wav')
-        self.ocean_noises.play()
-        self.seagull_noises.play()
+        
         
         self.tutorial = label.Label(self, size = (800,150), location = (800,150), font_size = 20)
         if self.android:
-            self.tutorialtext = [['line one', 'line one one'], ['line two', 'line two two']]
+            self.tutorialtext = [['Welcome to "it has a squid in it".', 'touch to skip'],
+                                 ['this squid is going', 'on a journey', 'your task is to guide him'],
+                                  ['what will you find', 'at the end?'],
+                                  ['tilt to move around', 'eat shrimp for a power-up'],
+                                  ['hit those who would stand in your way', 'with ink bullets'],
+                                  ['target groups for', 'a combo bonus.'],
+                                  ['when you run out of lives, your',' journey is over. good luck!'],
+                                  ['"Fate is a sea without shore, and the soul is a rock that abides;',
+                                   '"But her ears are vexed with the roar and her face with the foam of the tides."',
+                                   "- Swinburne"]
+                                  ]
             
         else: 
-            self.tutorialtext = [['tutorial', 'click to skip'],
+            self.tutorialtext = [['Welcome to "it has a squid in it".', 'click to skip'],
                                  ['this squid is going', 'on a journey', 'your task is to guide him'],
                                   ['what will you find', 'at the end?'],
                                   ['use the mouse pointer to move around', 'eat shrimp for a power-up'],
                                   ['hit those who would stand in your way', 'with ink bullets'],
                                   ['target groups for', 'a combo bonus.'],
-                                  ['when you run out of lives your',' journey is over. good luck!'],
+                                  ['when you run out of lives, your',' journey is over. good luck!'],
                                   ['"Fate is a sea without shore, and the soul is a rock that abides;',
                                    '"But her ears are vexed with the roar and her face with the foam of the tides."',
                                    "- Swinburne"]
@@ -61,28 +75,28 @@ class Cutscene0(scene.Scene):
         self.tutorial.clickable = False
         self.tutorial.textcolor = (pygame.color.Color("black"))
         self.tutorial.backgroundcolor = self.tutorial.transparent_color
-        """self.tutorial.fillcolor = (pygame.color.Color("black"))
-        self.tutorial.image.fill(self.tutorial.fillcolor)
-        self.tutorial.border_on = True
-        self.tutorial.bordercolor = (pygame.color.Color("white"))"""
         
-                   
         self.sprites = [self.foreground_map, self.squid,  
                         self.tutorial]  
         
-   
-    def start_game(self):
-        from gameplay import gamePlay
-        self.nextlevel = gamePlay()
-        self.level_transition()
+    def startup(self, time, persistant):
+        self.init_objects()
+        self.ocean_noises.play()
+        self.seagull_noises.play()
+        return scene.Scene.startup(self, time, persistant)
+    
+    def cleanup(self):        
+        return scene.Scene.cleanup(self)
+         
        
-    def update(self):       
+    def update_specifics(self):               
         self.click_counter -= 1
         self.squid.dx = self.squid.dy = 0
         self.squid.currentimage = self.squid.imgsquidge
-        if self.time%6 == 0:
+        print self.time
+        if self.time%10 == 0:
             self.squid.rect.x += 5
-            self.squid.rect.y += 2
+            self.squid.rect.y += 1
         else: pass
         if self.secret_line == True:
             if self.clicked == True:
@@ -96,13 +110,18 @@ class Cutscene0(scene.Scene):
                 if self.linecounter == len(self.tutorialtext):
                     self.ocean_noises.fadeout(1000)
                     self.seagull_noises.fadeout(1000)
-                    self.start_game()
+                    self.done = True
                 else:
                     self.tutorial.image.fill(self.tutorial.fillcolor)
                     self.tutorial.textlines = self.tutorialtext[self.linecounter]
                     
                 
 class Cutscene1(scene.Scene):
+    def __init__(self):        
+        scene.Scene.__init__(self)
+        self.next = "TITLE"
+
+    
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
         self.speed = self.MASTER_SPEED
@@ -127,28 +146,38 @@ class Cutscene1(scene.Scene):
         pass
            
     
-    def back_to_title(self):
-        from title import Title
-        self.nextlevel = Title()
-        self.level_transition()
-       
+    def startup(self, time, persistant):
+        self.init_objects()
+        return scene.Scene.startup(self, time, persistant)
+    
+    def cleanup(self):        
+        return scene.Scene.cleanup(self)
+           
     def fill_background(self):
         self.screen.blit(self.background, (0, 0))
                 
-    def update(self):       
+    def update_specifics(self):       
         """update title screen""" 
-        
-       
         if self.clicked ==True:
             if self.menu.option_highlighted == 0:
                 self.click_sound.play()
-                self.back_to_title()
+                self.done = True
         
     
         
 def main():
-    game = Cutscene1()
-    game.start()
+    import gameplay
+    import title
+    run_it = scene.Control()
+    state_dict = {"TITLE" : title.Title(),
+                  "INTRO" : Cutscene0(),
+                  "GAMEPLAY" : gameplay.gamePlay(),
+                  "ENDING": Cutscene1()
+                   }
+    run_it.setup_states(state_dict, "INTRO")
+    run_it.main()   
+    
 if __name__ == "__main__":
     main()
+        
         

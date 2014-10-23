@@ -20,15 +20,18 @@ import label
 
 
 class gamePlay(scene.Scene):
+    def __init__(self):        
+        scene.Scene.__init__(self)
+        self.next = "ENDING"
+    
     def init_variables(self):
         """ init all variables needed in scene"""
         self.speed = self.MASTER_SPEED
         self.scroll_to_left = True
-        self.number_of_baddies = 100
-        #self.number_of_baddies_used = 30
+        self.number_of_baddies = 50
         self.number_of_powerups = 5
         self.number_of_bullets = 30
-        self.wave_number = 1
+        self.wave_number = 0
         #the shooting speed number is the delay between bullets. a LOWER number means the bullets fire faster.
         self.shooting_speed = self.speed * 10
         self.default_shooting_speed = self.shooting_speed
@@ -41,11 +44,11 @@ class gamePlay(scene.Scene):
         self.bullettimer = 20
         self.bullet_powerup_timer = 0
         self.bullet_order = 0
-        self.title_time = self.time      
+        self.title_time = self.time    
         self.hudrect = pygame.rect.Rect(10,10,100,40)
         self.boss_dead = False
         self.squid_controllable = False
-                             
+                                    
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
         
@@ -102,6 +105,14 @@ class gamePlay(scene.Scene):
                         self.powerupGroup, self.bulletGroup, self.lifeGroup, self.label, self.scorelabel,self.continuelabel]  
         
         
+    
+    def startup(self, time, persistant):
+        self.init_objects()
+        return scene.Scene.startup(self, time, persistant)
+    
+    def cleanup(self):        
+        return scene.Scene.cleanup(self)
+    
         
     def detect_baddie_collisions(self):
         "detects collision between baddies and squid"
@@ -191,6 +202,7 @@ class gamePlay(scene.Scene):
             if collidedbaddie and collidedbaddie.check_bounds() == True\
              and collidedbaddie.currentimage is not collidedbaddie.imgdead:   
                 collidedbaddie.hp -= 1  
+                collidedbaddie.hit = True
                 self.vibrate(.1) 
                 self.baddie_damage_sound.play()
                 self.increment_score('baddie')
@@ -228,7 +240,13 @@ class gamePlay(scene.Scene):
                 self.vibrate(.1) 
                 b.reset()
                 if self.boss.hp <= 0:
+                    self.title_time = self.time + 50
                     self.if_boss_dead()
+                    self.ending_label()
+                    
+    def ending_label(self):
+        self.label.textlines = ["You Win!", "Score = {0}".format(self.score)]
+        self.label.toggle_visible(True)
     
     def increment_score(self, enemy_type):
         """raises score, refreshes score box"""
@@ -273,8 +291,9 @@ class gamePlay(scene.Scene):
             self.squid.dx = self.speed*2
         else: self.squid.dx = -self.speed*2
         self.squid.dy = 1
-        if self.squid.rect.x > self.field_length or self.squid.rect.x <0 :
-            if self.wave_number <= 0:
+        if self.squid.rect.x > self.field_length or self.squid.rect.x <0\
+         and self.title_time <  self.time - 100:
+            if self.wave_number <= 2:
                 self.new_wave(self.wave_number+1)
             else: self.quit_to_title()            
                         
@@ -313,15 +332,11 @@ class gamePlay(scene.Scene):
         else: pass
             
     def quit_to_title(self):
-        import cutscene
-        self.nextlevel = cutscene.Cutscene1()       
-        self.level_transition()
-
-            
+        self.done = True
            
-    def update(self): 
+    def update_specifics(self): 
         """things that need to be updated in individual scenes""" 
-       
+        
         self.collisiontimer -=1
         self.shield_counter -= 1
         #draw the little rectangle around the lifedots
@@ -334,10 +349,8 @@ class gamePlay(scene.Scene):
         self.accelerometer_controls()
         self.bullettimer -= 1  
         self.bullet_powerup_timer -=1
-        
-        if self.title_time <  self.time - 100 :
+        if self.title_time <  self.time - 100:
             self.label.toggle_visible(False)
-            self.label.text = " "
             self.squid_controllable = True
             
         if self.boss.check_bounds() == True and self.boss.shootable == True:
@@ -348,14 +361,17 @@ class gamePlay(scene.Scene):
         if self.boss_dead == True:
             self.end_wave()
         
-        
-        
-    
 def main():
-
-    game = gamePlay()
-
-    game.start()
+    import cutscene
+    import title
+    run_it = scene.Control()
+    state_dict = {"TITLE" : title.Title(),
+                  "INTRO" : cutscene.Cutscene0(),
+                  "GAMEPLAY" : gamePlay(),
+                  "ENDING": cutscene.Cutscene1()
+                   }
+    run_it.setup_states(state_dict, "GAMEPLAY")
+    run_it.main()   
+    
 if __name__ == "__main__":
-
-    main()
+    main() 

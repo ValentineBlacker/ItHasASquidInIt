@@ -16,7 +16,7 @@ import powerup
 import maphandler
 import label
 
-#TODO:
+#TODO: GALAGAS
 
 
 class gamePlay(scene.Scene):
@@ -44,7 +44,6 @@ class gamePlay(scene.Scene):
         self.bullettimer = 20
         self.bullet_powerup_timer = 0
         self.bullet_order = 0
-        self.title_time = self.time    
         self.hudrect = pygame.rect.Rect(10,10,100,40)
         self.boss_dead = False
         self.squid_controllable = False
@@ -108,6 +107,7 @@ class gamePlay(scene.Scene):
     
     def startup(self, time, persistant):
         self.init_objects()
+        self.start_time = time
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
@@ -334,9 +334,9 @@ class gamePlay(scene.Scene):
     def quit_to_title(self):
         self.done = True
            
-    def update_specifics(self): 
+    def update_specifics(self, time_delta): 
         """things that need to be updated in individual scenes""" 
-        
+        self.mouse_controls()
         self.collisiontimer -=1
         self.shield_counter -= 1
         #draw the little rectangle around the lifedots
@@ -348,8 +348,8 @@ class gamePlay(scene.Scene):
         self.bullet_baddie_collision()
         self.accelerometer_controls()
         self.bullettimer -= 1  
-        self.bullet_powerup_timer -=1
-        if self.title_time <  self.time - 100:
+        self.bullet_powerup_timer -=1        
+        if time_delta - self.start_time > 100:
             self.label.toggle_visible(False)
             self.squid_controllable = True
             

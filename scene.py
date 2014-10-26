@@ -46,14 +46,15 @@ class Control(object):
         self.state_name = start_state
         self.state = self.state_dict[self.state_name]    
         
-    def update(self):
+    def update(self, time_delta):
         """Checks if a state is done or has called for a game quit.
         State is flipped if neccessary and State.update is called."""
+        self.time = pygame.time.get_ticks()
         if self.state.quit:
             self.done = True
         elif self.state.done:
             self.flip_state()
-        self.state.update()
+        self.state.update(time_delta)
 
     def flip_state(self):
         """When a State changes to done necessary startup and cleanup functions
@@ -70,19 +71,21 @@ class Control(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT: # event.key == pygame.K_ESCAPE or 
                 self.done = True               
-                #pygame.quit() 
-                #if not android: 
-                    #sys.exit(0) 
+                pygame.quit() 
+                if not android: 
+                    sys.exit(0) 
             
             self.state.get_event(event)
             
     def main(self):
         """Main loop for entire program."""
-        while not self.done:
+        while not self.done:            
             self.event_loop()
-            self.update()
-            self.clock.tick(self.tick_speed)
             self.time = pygame.time.get_ticks()/self.tick_speed 
+            time_delta = self.time
+            self.update(time_delta)
+            self.clock.tick(self.tick_speed)
+            
             pygame.display.flip()               
             if android:
                 self.accelerometer() 
@@ -196,12 +199,12 @@ class Scene(object):
         self.groups.append(group)
                    
 
-    def update(self):
+    def update(self, time_delta):
         self.fill_background()
         for sprite in self.sprites:
             sprite.update()        
         self.mouse_controls()
-        self.update_specifics()
+        self.update_specifics(time_delta)
         
     def update_specifics(self):
         pass

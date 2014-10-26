@@ -7,6 +7,7 @@ import pygame
 import math 
 import random 
 import squid
+import beziers
 
 
 
@@ -36,9 +37,9 @@ class Baddie(squid.Squid):
         self.sinframe = 0    
         self.pause = 0
         self.delay = 7      
-        self.id = id
+        self.id = id        
         self.reset()
-        
+               
         
     def load_images(self):
                     

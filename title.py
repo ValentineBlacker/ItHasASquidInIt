@@ -62,7 +62,7 @@ class Title(scene.Scene):
         self.screen.blit(self.background, (0, 0))
         
                     
-    def update_specifics(self):       
+    def update_specifics(self, time_delta):       
         """update title screen"""         
         self.squid.currentimage = self.squid.imgtitle    
         if self.android:

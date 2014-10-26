@@ -89,12 +89,12 @@ class Cutscene0(scene.Scene):
         return scene.Scene.cleanup(self)
          
        
-    def update_specifics(self):               
+    def update_specifics(self, time_delta):               
         self.click_counter -= 1
         self.squid.dx = self.squid.dy = 0
         self.squid.currentimage = self.squid.imgsquidge
-        print self.time
-        if self.time%10 == 0:
+        
+        if time_delta%6 == 0:
             self.squid.rect.x += 5
             self.squid.rect.y += 1
         else: pass
@@ -156,7 +156,7 @@ class Cutscene1(scene.Scene):
     def fill_background(self):
         self.screen.blit(self.background, (0, 0))
                 
-    def update_specifics(self):       
+    def update_specifics(self, time_delta):       
         """update title screen""" 
         if self.clicked ==True:
             if self.menu.option_highlighted == 0:

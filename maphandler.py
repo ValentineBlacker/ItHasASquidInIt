@@ -24,7 +24,7 @@ class ScrollingMap:
     def __init__(self, scene, maptype):
         self.scene = scene  
         #this is the number of tiles making up the background- 0 for this game
-        self.map_width, self.map_height = 3, 1
+        self.map_width, self.map_height = 4, 1
         self.screen = scene.screen
         self.maptype = maptype
         self.masterspeed = scene.MASTER_SPEED
@@ -99,11 +99,12 @@ class ScrollingMap:
                 return True
             else: return False
 
-    def update(self):  
+    def update(self, time_delta):  
         """"Scroll tiles, draw to screen."""
+        
         if self.maptype == 'foreground':
             if self.evaluate_endpoint()== True:
-                self.dx = self.speed
+                self.dx = self.speed*3
             else: 
                 self.dx = 0
                 self.at_end = True
@@ -114,7 +115,7 @@ class ScrollingMap:
             else: self.dx = 0
         
         for tile in self.tiles: 
-            tile.rect.x += self.dx
-            #if self.check_visible(tile) == True:
-            self.screen.blit(tile.image, (tile.rect.x , tile.rect.y), 
+            tile.rect.x += int(self.dx* time_delta)  #this must be an int          
+            if self.check_visible(tile) == True:
+                self.screen.blit(tile.image, (tile.rect.x , tile.rect.y), 
                                  (0, 0, self.tile_size_x, self.tile_size_y))

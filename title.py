@@ -24,7 +24,7 @@ class Title(scene.Scene):
         self.squid.rect.center = (600,400)
         self.squid.currentimage = self.squid.imgtitle
         self.squid.dy = 0
-        self.squid.delay = 12
+        #self.squid.delay = 12
         self.squid.number_of_frames = 9
         self.label = label.Label(self)
         self.label.textlines = ["it has a squid in it"]
@@ -49,12 +49,12 @@ class Title(scene.Scene):
     def cleanup(self):        
         return scene.Scene.cleanup(self)
         
-    def mouse_controls(self):
+    def mouse_controls(self, time_delta):        
         "make squid follow cursor"
         focuspos = pygame.mouse.get_pos()
         diffx =  (self.squid.rect.center[0] - focuspos[0])
         if abs(diffx) > 50:
-            self.squid.dx += -diffx* .1
+            self.squid.dx += -int (diffx* .1)
         else: self.squid.dx = 0
           
     
@@ -62,7 +62,7 @@ class Title(scene.Scene):
         self.screen.blit(self.background, (0, 0))
         
                     
-    def update_specifics(self, time_delta):       
+    def update_specifics(self, time, time_delta):       
         """update title screen"""         
         self.squid.currentimage = self.squid.imgtitle    
         if self.android:

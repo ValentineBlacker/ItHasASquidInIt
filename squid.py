@@ -9,7 +9,7 @@ try:
     import android
 except ImportError:
     android = None
-
+#TIME time delta
 
 
 class Squid(pygame.sprite.DirtySprite):
@@ -24,7 +24,7 @@ class Squid(pygame.sprite.DirtySprite):
         
         self.pause = 0
         self.frame = 0   
-        self.delay = 7  
+        self.delay = 500       
         self.imgsize = (75, 75)
         self.reset()
         self.maxspeed = self.scene.speed * 3
@@ -140,21 +140,21 @@ class Squid(pygame.sprite.DirtySprite):
             
     
         
-    def animation(self):
+    def animation(self, time_delta):        
         self.pause += 1
-        if self.pause >= self.delay:
+        if self.pause >= int(self.delay*time_delta):
             self.pause = 0
             self.frame += 1
             if self.frame >= self.number_of_frames:
                 self.frame = 0               
         self.image = self.currentimage[self.frame]
         
-    def update(self):      
+    def update(self, time_delta):      
         self.check_bounds()
         self.enforce_speed_limit()
         
-        self.rect.x += self.dx
-        self.rect.y += self.dy  
+        self.rect.x += self.dx* time_delta
+        self.rect.y += self.dy  * time_delta
                        
         if self.dead == True:
             self.image = self.imgdead 
@@ -162,7 +162,7 @@ class Squid(pygame.sprite.DirtySprite):
         elif self.scene.collisiontimer > 0 and self.currentimage is not self.imgshield:
             self.image = self.imgdamage
         else:
-            self.animation()
+            self.animation(time_delta)
         
             if self.scene.shield_counter > 0:     
                 self.currentimage = self.imgshield                

@@ -17,7 +17,7 @@ class Boss(baddie.Baddie):
         #default sprite attributes
         self.pause = 0
         self.frame = 0   
-        self.delay = 7 
+        self.delay = 500 
         self.reset()
         
     def load_images(self):
@@ -71,16 +71,16 @@ class Boss(baddie.Baddie):
             self.rect.right = -20
         self.rect.bottom = self.scene.field_height
         
-        self.movement_length = 130
+        self.movement_length = 300
         self.movement_count = self.movement_length  
         
     
     def movement(self):
         "moves boss back and forth"
-        if self.movement_count < self.movement_length  and self.movement_count > 10:  
-            return -self.scene.speed*2
-        elif self.movement_count < 0 and self.movement_count > -self.movement_length +10 :
-            return self.scene.speed*2
+        if self.movement_count < self.movement_length  and self.movement_count > 100:  
+            return -self.scene.speed
+        elif self.movement_count < 0 and self.movement_count > -self.movement_length +100 :
+            return self.scene.speed
         else: return 0
        
     def die(self):
@@ -88,7 +88,7 @@ class Boss(baddie.Baddie):
         if self.frame >= self.number_of_frames-1:
             self.rect.x = -1000
                 
-    def update(self):
+    def update(self, time_delta):
         if self.currentimage == self.imgdead:
             self.die()
         if self.scene.foreground_map.at_end == True:
@@ -102,11 +102,11 @@ class Boss(baddie.Baddie):
                 self.shootable = True
                 if self.movement_count< -self.movement_length :
                     self.movement_count = self.movement_length
-                self.movement_count -=1
+                self.movement_count -=1 #* time_delta
                             
-            self.rect.x += self.dx
+            self.rect.x += self.dx* time_delta
             #the order here is important or the collidemask won't work for the flipped sprite
-            self.animation()
+            self.animation(time_delta)
             if self.scene.scroll_to_left :
                 self.flip()
             self.mask = pygame.mask.from_surface(self.image)

@@ -16,7 +16,8 @@ except ImportError:
     android = None
     import sys
     
-MASTER_SPEED = 3
+MASTER_SPEED = 36
+FPS = 30
 
 class Control(object):
     """Control class for entire project. Contains the game loop, and contains
@@ -28,11 +29,10 @@ class Control(object):
         self.state_name = None
         self.state = None
         
-        self.tick_speed = 35
+        self.fps = 60
         self.time = 0
         
-        self.time = pygame.time.get_ticks()/self.tick_speed    
-        
+           
         
         img_icon = image.load("images/icon.png")
         display.set_icon(img_icon)
@@ -54,7 +54,7 @@ class Control(object):
             self.done = True
         elif self.state.done:
             self.flip_state()
-        self.state.update(time_delta)
+        self.state.update(self.time,time_delta)
 
     def flip_state(self):
         """When a State changes to done necessary startup and cleanup functions
@@ -81,12 +81,10 @@ class Control(object):
         """Main loop for entire program."""
         while not self.done:            
             self.event_loop()
-            self.time = pygame.time.get_ticks()/self.tick_speed 
-            time_delta = self.time
-            self.update(time_delta)
-            self.clock.tick(self.tick_speed)
-            
-            pygame.display.flip()               
+            time_delta = self.clock.tick(self.fps)/1000.0
+            self.update(time_delta)  
+            pygame.display.flip()    
+            self.time = pygame.time.get_ticks()/self.fps           
             if android:
                 self.accelerometer() 
     
@@ -135,7 +133,7 @@ class Scene(object):
         """Add variables passed in persistant to the proper attributes and
         set the start time of the State to the current time."""
         self.persist = persistant
-        self.time = time
+        self.start_time = time
             
     def cleanup(self):
         """Add variables that should persist to the self.persist dictionary.
@@ -199,18 +197,19 @@ class Scene(object):
         self.groups.append(group)
                    
 
-    def update(self, time_delta):
+    def update(self, time, time_delta):
+        self.time = time
         self.fill_background()
         for sprite in self.sprites:
-            sprite.update()        
-        self.mouse_controls()
-        self.update_specifics(time_delta)
+            sprite.update(time_delta)        
+        self.mouse_controls(time_delta)
+        self.update_specifics(time, time_delta)
         
-    def update_specifics(self):
+    def update_specifics(self, time, time_delta):
         pass
         
     
-    def mouse_controls(self):
+    def mouse_controls(self, time_delta):
         pass
   
     

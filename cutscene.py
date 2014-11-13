@@ -89,15 +89,16 @@ class Cutscene0(scene.Scene):
         return scene.Scene.cleanup(self)
          
        
-    def update_specifics(self, time_delta):               
+    def update_specifics(self, time, time_delta):               
         self.click_counter -= 1
         self.squid.dx = self.squid.dy = 0
         self.squid.currentimage = self.squid.imgsquidge
         
-        if time_delta%6 == 0:
-            self.squid.rect.x += 5
+        if self.click_counter%2 == 0:
+            self.squid.rect.x += 2
             self.squid.rect.y += 1
         else: pass
+        
         if self.secret_line == True:
             if self.clicked == True:
                 self.tutorialtext = self.tutorialtext[:-1]
@@ -142,7 +143,7 @@ class Cutscene1(scene.Scene):
         self.click_sound = pygame.mixer.Sound('sounds/157539__nenadsimic__click.wav')
         
         
-    def mouse_controls(self):
+    def mouse_controls(self, time_delta):
         pass
            
     
@@ -156,7 +157,7 @@ class Cutscene1(scene.Scene):
     def fill_background(self):
         self.screen.blit(self.background, (0, 0))
                 
-    def update_specifics(self, time_delta):       
+    def update_specifics(self, time,time_delta):       
         """update title screen""" 
         if self.clicked ==True:
             if self.menu.option_highlighted == 0:

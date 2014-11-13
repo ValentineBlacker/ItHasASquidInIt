@@ -31,12 +31,12 @@ class Powerup(baddie.Baddie):
     def animation(self):
         pass
          
-    def update(self):
+    def update(self, time_delta):
         self.startmovement -=1
         if self.startmovement <0:
             if self.scene.foreground_map.at_end == True:
-                self.rect.x += (self.dx/2)
-            else: self.rect.x += self.dx
+                self.rect.x += (self.dx/2)* time_delta
+            else: self.rect.x += self.dx* time_delta
             if self.check_bounds() == True:
                 self.scene.screen.blit(self.image, (self.rect.x, self.rect.y), 
                                        special_flags= 0)
@@ -50,7 +50,7 @@ class Powerup(baddie.Baddie):
                             self.scene.foreground_map.map_width)/4)
         if self.scene.scroll_to_left == True:
             self.dx = - (self.scene.speed + self.scene.wave_number+2)
-        else: self.dx = (self.scene.speed + self.scene.wave_number+2)
+        else: self.dx = (self.scene.speed + self.scene.wave_number+2) 
                         
         self.power_dict = {0: 'blue',
                            1: 'red',

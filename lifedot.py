@@ -37,7 +37,7 @@ class LifeDot(pygame.sprite.DirtySprite):
         self.imagemaster = pygame.Surface(self.imgsize, pygame.SRCALPHA)        
         self.imagemaster.blit(imgmaster, (0, 0), ((0,0), self.imgsize))  
     
-    def update(self):
+    def update(self, time_delta):
         self.scene.screen.blit(self.imagemaster, (self.rect.x, self.rect.y), special_flags= 0)
         
         

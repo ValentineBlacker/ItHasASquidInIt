@@ -49,9 +49,9 @@ class Bullet(pygame.sprite.DirtySprite):
         
   
         
-    def update(self):
+    def update(self, time_delta):
         
-        self.rect.x += self.dx
+        self.rect.x += self.dx * time_delta
         #self.rect.y += self.dy
         self.check_bounds()
         
@@ -60,13 +60,13 @@ class Bullet(pygame.sprite.DirtySprite):
                 
     
             
-    def is_fired(self, posx, posy):
+    def is_fired(self, posx, posy, time_delta):
         """fires bullets"""        
         self.rect.x = posx
         self.rect.y = posy
         if self.scene.scroll_to_left == True:
-            self.dx = self.speed       
-        else: self.dx = -self.speed 
+            self.dx = int(self.speed)            
+        else: self.dx = -int(self.speed)
         self._set_visible(True)
  
    

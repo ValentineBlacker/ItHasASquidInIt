@@ -71,7 +71,7 @@ class Label(pygame.sprite.DirtySprite):
             elif self.get_mouse_collision(self.rect) == 0:
                 self.option_highlighted = None
        
-    def update(self):
+    def update(self, time_delta):
         #change any color to PINK to make that part transparent.
         #border defaults to transparent    
         #add self.backgroundcolor to this to have a bg color

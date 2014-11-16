@@ -55,7 +55,7 @@ class Boss(baddie.Baddie):
         self.pause = 0
         self.frame = 0
         self.hp = (self.scene.wave_number*5)+ 20
-        self.image_size = (700,700)
+        self.image_size = (500,500)
         self.number_of_frames = 8        
         self.load_images()        
         self.image = self.imgstand
@@ -71,7 +71,7 @@ class Boss(baddie.Baddie):
             self.rect.right = -20
         self.rect.bottom = self.scene.field_height
         
-        self.movement_length = 300
+        self.movement_length = 400
         self.movement_count = self.movement_length  
         
     

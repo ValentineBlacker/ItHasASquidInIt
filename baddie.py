@@ -7,8 +7,6 @@ import pygame
 import math 
 import random 
 import squid
-import pycurve
-import scene
 
 
 #imgsize = (75,75)
@@ -104,10 +102,11 @@ class Baddie(squid.Squid):
     def die(self):
         """if curent image is dead, moves self offscreen after animation plays."""
         if self.frame >= self.number_of_frames-1:
-            if self.scene.boss_dead == False:
-                self.dead = True
-                self.reset()
-            else: self.rect.x = -1000
+            self.dead = True
+            self.reset()
+            #if self.scene.boss_dead == False:                
+                
+            #else: self.rect.center = (9000,9000)
           
             
     def determine_movement(self):

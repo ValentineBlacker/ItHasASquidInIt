@@ -213,7 +213,7 @@ class gamePlay(scene.Scene):
                 collidedbaddie.hp -= 1  
                 collidedbaddie.hit = True
                 self.vibrate(.1) 
-                #self.baddie_damage_sound.play()
+                self.baddie_damage_sound.play()
                 self.increment_score('baddie')
                 b.reset()
                 if collidedbaddie.hp <= 0:
@@ -287,9 +287,7 @@ class gamePlay(scene.Scene):
         self.boss.frame = 0
         self.boss.currentimage = self.boss.imgdead
         for b in self.baddies:
-            b.currentimage = b.imgdead
-            if b.frame >3:
-                b.rect.center = (9000,9000)
+            b.currentimage = b.imgdead            
         self.boss_dead = True
         
         

@@ -4,6 +4,7 @@ Created on Aug 8, 2014
 @author: DemiCow
 '''
 import pygame
+import prepare
 
 try:
     import android
@@ -59,11 +60,8 @@ class Squid(pygame.sprite.DirtySprite):
             self.dx = 1
         
         
-    def load_images(self):
-        imagemaster = pygame.image.load("images/vampy.png")
-        imagemaster = imagemaster.convert_alpha()
-        
-        
+    def load_images(self):        
+        imagemaster = prepare.IMAGES['vampy']
         
         #standing still frame
         self.imgstand = pygame.Surface(self.imgsize, pygame.SRCALPHA)
@@ -141,7 +139,7 @@ class Squid(pygame.sprite.DirtySprite):
     
         
     def animation(self, time_delta):        
-        self.pause += 1
+        self.pause += 1        
         if self.pause >= int(self.delay*time_delta):
             self.pause = 0
             self.frame += 1
@@ -149,7 +147,9 @@ class Squid(pygame.sprite.DirtySprite):
                 self.frame = 0               
         self.image = self.currentimage[self.frame]
         
-    def update(self, time_delta):      
+    def update(self, time_delta):   
+        #delay is shorter the faster squid moves
+        self.delay = 500 - abs(((self.dx * time_delta) + (self.dy * time_delta))/2)* 60           
         self.check_bounds()
         self.enforce_speed_limit()
         
@@ -158,6 +158,7 @@ class Squid(pygame.sprite.DirtySprite):
                        
         if self.dead == True:
             self.image = self.imgdead 
+            self.dy = -1
             
         elif self.scene.collisiontimer > 0 and self.currentimage is not self.imgshield:
             self.image = self.imgdamage

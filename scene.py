@@ -6,6 +6,7 @@ Created on Aug 8, 2014
 
 import pygame 
 from pygame import display, image
+import prepare
 
 
 # Import the android module. If we can't import it, set it to None - this
@@ -16,8 +17,7 @@ except ImportError:
     android = None
     import sys
     
-MASTER_SPEED = 36
-FPS = 30
+
 
 class Control(object):
     """Control class for entire project. Contains the game loop, and contains
@@ -29,14 +29,9 @@ class Control(object):
         self.state_name = None
         self.state = None
         
-        self.fps = 60
+        self.fps = prepare.FPS
         self.time = 0
-        
-           
-        
-        img_icon = image.load("images/icon.png")
-        display.set_icon(img_icon)
-        display.set_caption("it has a squid in it")
+         
         self.done = False 
     
     def setup_states(self, state_dict, start_state):
@@ -82,16 +77,17 @@ class Control(object):
         while not self.done:            
             self.event_loop()
             time_delta = self.clock.tick(self.fps)/1000.0
+            pygame.display.set_caption(str(self.clock.get_fps()))
             self.update(time_delta)  
             pygame.display.flip()    
-            self.time = pygame.time.get_ticks()/self.fps           
+            self.time = pygame.time.get_ticks()/self.fps          
             if android:
                 self.accelerometer() 
     
 class Scene(object):
     def __init__(self):    
         """sets up things needed in all scenes. not meant to be used on its own."""    
-        pygame.init()  
+         
         #inits android if it's been imported            
         if android:
             android.init()
@@ -99,19 +95,18 @@ class Scene(object):
             self.android = android
         else: self.android = None
         
-        pygame.mixer.init()
         
         self.start_time = 0
         self.time = 0
-        resolution = (1280, 768)
-        self.screen = pygame.display.set_mode(resolution)
+        resolution = prepare.RESOLUTION
+        self.screen = prepare.SCREEN
         self.screen_center = ((resolution[0]/2), (resolution[1]/2))
         self.field_length = resolution[0]
         self.field_height = resolution[1]
         self.fullscreen = 0
         self.screen_center = ((resolution[0]/2), (resolution[1]/2))
        
-        self.MASTER_SPEED = MASTER_SPEED
+        self.MASTER_SPEED = prepare.MASTER_SPEED
         #camera determines what's visible and what's off screen
         self.camera = self.screen.get_rect()
                  
@@ -119,8 +114,8 @@ class Scene(object):
         self.sprites = []
         self.maps = []
         self.groups = []
-        self.init_variables()
-        self.init_objects()   
+        #self.init_variables()
+        #self.init_objects()   
         self.clicked = False
         
         self.done = False

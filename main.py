@@ -8,6 +8,7 @@ import gameplay
 import title
 import cutscene
 
+
 def main():
     """Add states to control here."""
     run_it = scene.Control()
@@ -19,7 +20,6 @@ def main():
     run_it.setup_states(state_dict, "TITLE")
     run_it.main()   
 
-if __name__ == "__main__":
-
+if __name__ == "__main__":    
     main()     
     

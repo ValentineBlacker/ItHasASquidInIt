@@ -9,8 +9,7 @@ import pycurve
 class baddie_List:
     def __init__(self, scene, baddie_list, list_id):
         self.scene = scene
-        self.baddie_list = baddie_list
-        self.paths = [pycurve.make_b_spline(scene,pycurve.PATHS[pycurve.PATHS.index(x)]) for x in pycurve.PATHS]
+        self.baddie_list = baddie_list        
         self.list_id = list_id
         for x in self.baddie_list:
             x.list_id = self.list_id
@@ -37,6 +36,7 @@ class baddie_List:
                                 x.rect.x, x.rect.y = self.path[(self.movement_counter-self.startmovement)- self.baddie_list.index(x)*50]
                         
     def reset(self):
+        self.paths = [pycurve.make_b_spline(self.scene,pycurve.PATHS[pycurve.PATHS.index(x)]) for x in pycurve.PATHS]
         self.path = self.paths[random.randrange(0,len(self.paths))]        
         self.startmovement = random.randrange\
                         (0,(self.scene.field_length*1.5)- (self.scene.wave_number* 50))          

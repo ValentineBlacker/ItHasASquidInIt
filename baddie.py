@@ -7,6 +7,7 @@ import pygame
 import math 
 import random 
 import squid
+import prepare
 
 
 #imgsize = (75,75)
@@ -24,7 +25,7 @@ class Baddie(squid.Squid):
         """ intialize sprite class """
         pygame.sprite.DirtySprite.__init__(self)
         self.scene = scene
-        self.screen = scene.screen   
+        self.screen = prepare.SCREEN
        
         self.wave_dict = {0 : ['l_fish','b_fish','q_fish'], 
                           1: ['mothfish', 'ecto', 'strix'],
@@ -41,11 +42,8 @@ class Baddie(squid.Squid):
         self.list_index = 0
         self.reset()
                 
-    def load_images(self):
-                    
-        self.imgmaster= pygame.image.load("images/baddies/{0}.png".format
-                                           (self.name))        
-        self.imgmaster = self.imgmaster.convert_alpha()
+    def load_images(self):       
+        self.imgmaster = prepare.BADDIES[self.name]
     
         #intial placeholder image
         self.imgstand = pygame.Surface(self.image_size, pygame.SRCALPHA)        

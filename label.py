@@ -4,12 +4,12 @@ Created on Aug 8, 2014
 @author: DemiCow
 '''
 
-import pygame
+import pygame, prepare
 
 class Label(pygame.sprite.DirtySprite):    
     """label class prints text on screen. You can change size and color no problem."""
     def __init__(self, scene, size = (700,200), location = (600,300), 
-                 font_size = 72, font_name = "images/Nobile-Regular.ttf"):
+                 font_size = 72, font_name = prepare.FONT):
         
         pygame.sprite.DirtySprite.__init__(self)     
         self.scene = scene 

@@ -7,19 +7,28 @@ import pygame
 import scene
 import squid
 import label
+import prepare
 
 class Title(scene.Scene):
     
     def __init__(self):        
         scene.Scene.__init__(self)
         self.next = "INTRO"
+        self.init_variables()
+        self.init_objects()   
     
-    def init_objects(self):
-        """ creates objects needed in specfic scenes"""
-        self.speed = self.MASTER_SPEED
-        self.scroll_to_left = None
+    def init_variables(self):
         self.collisiontimer = 0
         self.shield_counter = 0
+    
+    def init_objects(self):
+        """ creates objects needed in specfic scenes"""        
+        self.background_music =  pygame.mixer.Sound(prepare.SOUNDS['freefade'])
+        if pygame.mixer.get_busy() == False:
+            self.background_music.play(loops= -1)                 
+        self.speed = self.MASTER_SPEED
+        self.scroll_to_left = None
+        
         self.squid = squid.Squid(self)
         self.squid.rect.center = (600,400)
         self.squid.currentimage = self.squid.imgtitle
@@ -39,16 +48,19 @@ class Title(scene.Scene):
         self.background.fill(pygame.color.Color("black"))
         self.screen.blit(self.background, (0, 0))
         self.sprites = [self.label, self.menu,self.squid]
-        self.click_sound = pygame.mixer.Sound('sounds/157539__nenadsimic__click.wav')
         
+        self.click_sound = pygame.mixer.Sound(prepare.SOUNDS['157539__nenadsimic__click'])
+       
         
-    def startup(self, time, persistant):
-        self.init_objects()
+    def startup(self, time, persistant): 
+        self.start_time = time    
+        self.background_music.play(loops= -1)      
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
         return scene.Scene.cleanup(self)
-        
+    
+           
     def mouse_controls(self, time_delta):        
         "make squid follow cursor"
         focuspos = pygame.mouse.get_pos()
@@ -79,11 +91,13 @@ class Title(scene.Scene):
         if self.clicked ==True:
             if self.menu.option_highlighted == 0:
                 self.click_sound.play()
+                #self.background_music.fadeout(1000)  
+                pygame.mixer.stop()              
                 self.done = True
         
         
     
-def main():
+def main():    
     import gameplay
     import cutscene
     run_it = scene.Control()

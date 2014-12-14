@@ -6,6 +6,7 @@ Created on Aug 8, 2014
 
 
 import pygame
+import prepare
 
 try:
     import android
@@ -40,8 +41,7 @@ class Bullet(pygame.sprite.DirtySprite):
         
         
     def load_images(self):
-        imagemaster = pygame.image.load("images/bullet.png")
-        imagemaster = imagemaster.convert_alpha()        
+        imagemaster = prepare.IMAGES['bullet']     
         self.imgsize = (7, 7)
         
         self.imagebullet = pygame.Surface(self.imgsize, pygame.SRCALPHA)

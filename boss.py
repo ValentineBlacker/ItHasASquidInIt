@@ -5,6 +5,7 @@ Created on Aug 11, 2014
 '''
 import pygame
 import baddie
+import prepare
 
 
 class Boss(baddie.Baddie):
@@ -21,9 +22,9 @@ class Boss(baddie.Baddie):
         self.reset()
         
     def load_images(self):
-        self.imgmaster= pygame.image.load("images/bosses/boss{0}.png".format (self.scene.wave_number))        
-        self.imgmaster = self.imgmaster.convert_alpha()
-        
+        #self.imgmaster= pygame.image.load("images/bosses/boss{0}.png".format (self.scene.wave_number))        
+        #self.imgmaster = self.imgmaster.convert_alpha()
+        self.imgmaster = prepare.BOSSES['boss{0}'.format(self.scene.wave_number)]
        
         #intial placeholder image
         self.imgstand = pygame.Surface(self.image_size, pygame.SRCALPHA)        
@@ -71,7 +72,7 @@ class Boss(baddie.Baddie):
             self.rect.right = -20
         self.rect.bottom = self.scene.field_height
         
-        self.movement_length = 400
+        self.movement_length = 300
         self.movement_count = self.movement_length  
         
     

@@ -9,12 +9,17 @@ import scene
 import label
 import maphandler
 import squid
+import prepare
 
 class Cutscene0(scene.Scene):
     
     def __init__(self):        
         scene.Scene.__init__(self)
+        
         self.next = "GAMEPLAY"
+        self.init_variables()
+        self.init_objects()  
+        
     
     def init_variables(self):
         """ init all variables needed in scene"""
@@ -37,10 +42,10 @@ class Cutscene0(scene.Scene):
         
         self.foreground_map = maphandler.ScrollingMap(self, 'splash')
         self.maps = [self.foreground_map]  
-        
-        self.ocean_noises =  pygame.mixer.Sound('sounds/31762__slanesh__ocean.wav')
-        self.seagull_noises =  pygame.mixer.Sound('sounds/144836__eelke__sea-seagulls-crows-windfilter.wav')
-        
+        #pygame.mixer.init()
+        self.ocean_noises =  pygame.mixer.Sound(prepare.SOUNDS['31762__slanesh__ocean'])
+        self.seagull_noises =  pygame.mixer.Sound(prepare.SOUNDS['144836__eelke__sea-seagulls-crows-windfilter'])
+        self.click_sound = pygame.mixer.Sound(prepare.SOUNDS['157539__nenadsimic__click'])
         
         self.tutorial = label.Label(self, size = (800,150), location = (800,150), font_size = 20)
         if self.android:
@@ -57,17 +62,12 @@ class Cutscene0(scene.Scene):
                                   ]
             
         else: 
-            self.tutorialtext = [['Welcome to "it has a squid in it".', 'click to skip'],
-                                 ['this squid is going', 'on a journey', 'your task is to guide him'],
-                                  ['what will you find', 'at the end?'],
-                                  ['use the mouse pointer to move around', 'eat shrimp for a power-up'],
-                                  ['hit those who would stand in your way', 'with ink bullets'],
-                                  ['target groups for', 'a combo bonus.'],
-                                  ['when you run out of lives, your',' journey is over. good luck!'],
-                                  ['"Fate is a sea without shore, and the soul is a rock that abides;',
-                                   '"But her ears are vexed with the roar and her face with the foam of the tides."',
-                                   "- Swinburne"]
-                                  ]
+            self.tutorialtext = [
+                                  ['"Fate is a sea without shore,' ],
+                                   ['and the soul is a rock that abides;'],
+                                   ['But her ears are vexed with the roar '],
+                                   ['and her face with the foam of the tides." - Swinburne'],
+                                  ]                                  
             
         self.linecounter = 0
        
@@ -79,10 +79,10 @@ class Cutscene0(scene.Scene):
         self.sprites = [self.foreground_map, self.squid,  
                         self.tutorial]  
         
-    def startup(self, time, persistant):
-        self.init_objects()
-        self.ocean_noises.play()
-        self.seagull_noises.play()
+    def startup(self, time, persistant): 
+        self.ocean_noises.play(loops=-1)
+        self.seagull_noises.play(loops=-1)         
+        self.start_time = time
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
@@ -99,22 +99,18 @@ class Cutscene0(scene.Scene):
             self.squid.rect.y += 1
         else: pass
         
-        if self.secret_line == True:
-            if self.clicked == True:
-                self.tutorialtext = self.tutorialtext[:-1]
-                self.secret_line = False
-                print self.tutorialtext
-        
+                
         if self.clicked ==True and self.click_counter < 0 or self.click_counter < -self.text_delay:
-                self.click_counter = 30   
-                self.linecounter += 1                 
-                if self.linecounter == len(self.tutorialtext):
-                    self.ocean_noises.fadeout(1000)
-                    self.seagull_noises.fadeout(1000)
-                    self.done = True
-                else:
-                    self.tutorial.image.fill(self.tutorial.fillcolor)
-                    self.tutorial.textlines = self.tutorialtext[self.linecounter]
+            self.click_sound.play()
+            self.click_counter = 30   
+            self.linecounter += 1                 
+            if self.linecounter == len(self.tutorialtext):
+                self.ocean_noises.fadeout(1000)
+                self.seagull_noises.fadeout(1000)
+                self.done = True
+            else:
+                self.tutorial.image.fill(self.tutorial.fillcolor)
+                self.tutorial.textlines = self.tutorialtext[self.linecounter]
                     
                 
 class Cutscene1(scene.Scene):
@@ -140,7 +136,7 @@ class Cutscene1(scene.Scene):
         self.background.fill(pygame.color.Color("black"))
         self.screen.blit(self.background, (0, 0))
         self.sprites = [self.label, self.menu]
-        self.click_sound = pygame.mixer.Sound('sounds/157539__nenadsimic__click.wav')
+        self.click_sound = pygame.mixer.Sound(prepare.SOUNDS['157539__nenadsimic__click.wav'])
         
         
     def mouse_controls(self, time_delta):
@@ -148,7 +144,7 @@ class Cutscene1(scene.Scene):
            
     
     def startup(self, time, persistant):
-        self.init_objects()
+        self.start_time = time
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
@@ -167,12 +163,14 @@ class Cutscene1(scene.Scene):
     
         
 def main():
-    import gameplay
-    import title
+    pygame.init()
+    pygame.mixer.init()
+    #import gameplay
+    #import title
     run_it = scene.Control()
-    state_dict = {"TITLE" : title.Title(),
+    state_dict = {#"TITLE" : title.Title(),
                   "INTRO" : Cutscene0(),
-                  "GAMEPLAY" : gameplay.gamePlay(),
+                  #"GAMEPLAY" : gameplay.gamePlay(),
                   "ENDING": Cutscene1()
                    }
     run_it.setup_states(state_dict, "INTRO")

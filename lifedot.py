@@ -4,7 +4,7 @@ Created on Aug 8, 2014
 @author: DemiCow
 
 '''
-import pygame
+import pygame, prepare
 
 class LifeDot(pygame.sprite.DirtySprite):
     """The icons that show how many lives you have left. Also draws nice border
@@ -30,8 +30,7 @@ class LifeDot(pygame.sprite.DirtySprite):
     
                 
     def load_images(self):
-        imgmaster = pygame.image.load("images/icon.png")
-        imgmaster = imgmaster.convert_alpha()        
+        imgmaster = prepare.IMAGES['icon']     
         self.imgsize = (32, 32)
         
         self.imagemaster = pygame.Surface(self.imgsize, pygame.SRCALPHA)        

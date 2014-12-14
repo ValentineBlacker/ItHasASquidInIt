@@ -3,7 +3,7 @@ Created on Aug 8, 2014
 
 @author: DemiCow
 '''
-import pygame, random, baddie
+import pygame, random, baddie, prepare
 
 class Powerup(baddie.Baddie):    
     def __init__(self, scene):     
@@ -15,8 +15,7 @@ class Powerup(baddie.Baddie):
         
     def load_images(self):
         """ Loads powerup image based on color"""
-        imagemaster = pygame.image.load("images/prawn.png")
-        imagemaster = imagemaster.convert_alpha()
+        imagemaster = prepare.IMAGES['prawn']
         offset_dict = {'blue': 0, 'red': 1, 'yellow': 2}
         self.img_drop = pygame.Surface(self.image_size, pygame.SRCALPHA)        
         self.img_drop.blit(imagemaster, (0, 0), ((0,0), self.image_size))

@@ -146,7 +146,7 @@ class Bspline(object):
 
 ################################################################################
 def make_b_spline(scene, P):
-    STEP_N = int(scene.field_length/2)
+    STEP_N = int((scene.field_length/2)- scene.wave_number*20)
     
     
     

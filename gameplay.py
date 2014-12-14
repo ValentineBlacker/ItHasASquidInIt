@@ -16,14 +16,24 @@ import powerup
 import maphandler
 import label
 import baddie_movement
+import prepare
 
-#TODO: END OF WAVE BADDIES
+#TODO:
+# BOSS
+#DIFFICULTY SHOULD INCREASE
+#add pause
+#WHAT DID WE LEARN:
+#put all music in startup EXCEPT that for first scene.
+
+
 
 
 class gamePlay(scene.Scene):
     def __init__(self):        
         scene.Scene.__init__(self)
         self.next = "ENDING"
+        self.init_variables()
+        self.init_objects()   
     
     def init_variables(self):
         """ init all variables needed in scene"""
@@ -31,7 +41,7 @@ class gamePlay(scene.Scene):
         self.scroll_to_left = True
         self.number_of_baddies = 50
         
-        self.number_of_powerups = 5
+        self.number_of_powerups = 3
         self.number_of_bullets = 30
         self.wave_number = 0
         #the shooting speed number is the delay between bullets. a LOWER number means the bullets fire faster.
@@ -49,15 +59,16 @@ class gamePlay(scene.Scene):
         self.hudrect = pygame.rect.Rect(10,10,100,40)
         self.boss_dead = False
         self.squid_controllable = False
-        #self.paths = [pycurve.make_b_spline(self,pycurve.PATHS[pycurve.PATHS.index(x)]) for x in pycurve.PATHS]
-                                                    
+                                                            
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
-        
-        self.baddie_damage_sound = pygame.mixer.Sound('sounds/34172__glaneur-de-sons__woosh-02.wav')
-        self.squid_damage_sound = pygame.mixer.Sound('sounds/92736__robinhood76__01522-swoosh-1.wav')
-        self.powerup_sound = pygame.mixer.Sound('sounds/174462__yottasounds__power-up-001.wav')
-        
+        self.background_songs = ['precipice', 'call', 'hack attack', 'tilt', 'depths', 'drive me',
+                                  'rolling on', 'wormhole', 'oomph', 'ourou', 'try', 'jumpstyle', 'laconia',
+                                  'oceania', 'freefade']
+        self.baddie_damage_sound = pygame.mixer.Sound(prepare.SOUNDS['34172__glaneur-de-sons__woosh-02'])
+        self.squid_damage_sound = pygame.mixer.Sound(prepare.SOUNDS['92736__robinhood76__01522-swoosh-1'])
+        self.powerup_sound = pygame.mixer.Sound(prepare.SOUNDS['174462__yottasounds__power-up-001'])
+            
         self.squid = squid.Squid(self)
         
         self.background_map = maphandler.ScrollingMap(self, 'background')
@@ -107,6 +118,8 @@ class gamePlay(scene.Scene):
         self.sprites = [self.background_map, self.foreground_map, self.squid, self.boss, self.baddieGroup,  
                         self.powerupGroup, self.bulletGroup, self.lifeGroup, self.label, self.scorelabel,self.continuelabel]  
         
+       
+        
     def create_baddie_lists(self):
         self.baddie_lists = []
         b_l = [self.baddies[x*5:(x*5)+ 5] for x in range(len(self.baddies)/5)]
@@ -114,13 +127,17 @@ class gamePlay(scene.Scene):
             self.baddie_lists.append(baddie_movement.baddie_List(self,b,b_l.index(b))    )      
                 
                 
-    def startup(self, time, persistant):
-        self.init_objects()
-        self.start_time = time
+    def startup(self, time, persistant):        
+        self.start_time = time     
+        self.set_music()    
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
         return scene.Scene.cleanup(self)
+    
+    def set_music(self):
+        self.background_music = pygame.mixer.Sound(prepare.SOUNDS[self.background_songs[self.wave_number]])              
+        self.background_music.play(loops=-1)
     
         
     def detect_baddie_collisions(self):
@@ -160,9 +177,9 @@ class gamePlay(scene.Scene):
                         self.life = self.life + 1
                         self.lifeGroup.add(self.lifedots[self.life-1])
                 elif collidedpowerup.color == 'red':
-                    self.bullet_powerup_timer = self.speed * 2        
+                    self.bullet_powerup_timer = self.speed * 4        
                 elif collidedpowerup.color == 'yellow':            
-                    self.shield_counter = self.speed *2
+                    self.shield_counter = self.speed *4
                 collidedpowerup.reset()
                 
                       
@@ -179,13 +196,12 @@ class gamePlay(scene.Scene):
         
     def squid_killed(self): 
         "when main character dies, kill it and display continue menu."
-        self.squid.dx = 0
-        self.squid.dy = -1
+        self.squid_controllable = False    
         self.squid.dead = True 
         self.label.toggle_visible(True)
         self.label.textlines = ["it HAD a squid in it"]
         self.start_time= self.time
-        self.squid_controllable = False
+        
         self.continuelabel.toggle_visible(True)
         
     def handle_bullets(self, time_delta):
@@ -280,6 +296,7 @@ class gamePlay(scene.Scene):
         self.boss.reset()        
         self.squid.reset()
         self.squid_controllable = True
+        self.set_music()
         
     def if_boss_dead(self):
         "if boss is killed, start next wave."
@@ -291,6 +308,7 @@ class gamePlay(scene.Scene):
         self.boss_dead = True
         
         
+        
     def end_wave(self):
         """ends current wave"""
         self.squid_controllable = False
@@ -300,6 +318,7 @@ class gamePlay(scene.Scene):
         self.squid.dy = 1
         if self.squid.rect.x > self.field_length or self.squid.rect.x <0\
          and self.start_time <  self.time - 10000:
+            self.background_music.fadeout(1000)
             if self.wave_number <= 2:
                 self.new_wave(self.wave_number+1)
             else: self.quit_to_title()            
@@ -364,6 +383,7 @@ class gamePlay(scene.Scene):
             self.detect_boss_collision() 
             self.bullet_boss_collision()
         if self.squid.dead == True: 
+            self.background_music.fadeout(1000)
             self.handle_dead_menu()
         if self.boss_dead == True:
             self.end_wave()
@@ -374,6 +394,7 @@ class gamePlay(scene.Scene):
 def main():
     import cutscene
     import title
+    
     run_it = scene.Control()
     state_dict = {"TITLE" : title.Title(),
                   "INTRO" : cutscene.Cutscene0(),

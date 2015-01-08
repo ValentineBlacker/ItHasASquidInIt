@@ -10,10 +10,10 @@ Controls: Use the mouse to move Vampy around the screen! Ink bullets are fired a
 
 This game is also designed to work with Pygame for Android, but this version has not been tested yet. If running in Android, the squid is controlled by the accelerometer
 
-![Screenshot 0](http://i.imgur.com/8sECNj4.png)
-![Screenshot 1](http://i.imgur.com/AeMLYzS.png)
-![Screenshot 2](http://i.imgur.com/l0z5xpP.png)
-![Screenshot 3](http://i.imgur.com/wbJxUd7.png)
+![Screenshot 0](http://i.imgur.com/hwd3XD9.png)
+![Screenshot 1](http://i.imgur.com/FXJCkro.png)
+![Screenshot 2](http://i.imgur.com/RUC0Z20.png)
+![Screenshot 3](http://i.imgur.com/ctmRwEZ.png)
 
 
 

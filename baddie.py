@@ -90,7 +90,7 @@ class Baddie(squid.Squid):
                     self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 2) 
                     self.hit = False
                 else: 
-                    if self.list_index == 0:
+                    if self.list_index == self.magic_index:
                         self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
                         self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 1)                        
                     else: self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)

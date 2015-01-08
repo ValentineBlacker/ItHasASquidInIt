@@ -6,7 +6,7 @@ Created on Aug 11, 2014
 import pygame
 import baddie
 import prepare
-
+import math
 
 class Boss(baddie.Baddie):
 
@@ -18,6 +18,7 @@ class Boss(baddie.Baddie):
         #default sprite attributes
         self.pause = 0
         self.frame = 0   
+        self.sine_variables()
         self.delay = 500 
         self.reset()
         
@@ -83,6 +84,21 @@ class Boss(baddie.Baddie):
         elif self.movement_count < 0 and self.movement_count > -self.movement_length +100 :
             return self.scene.speed
         else: return 0
+    
+    def sine_variables(self):
+        self.sinpause = 0     
+        self.sinframe = 0    
+        
+    def sine_wave(self, delay = 100, modifier = 100):        
+        #frame is x. yposition = sin(x)
+        self.sinpause += 1
+        if self.sinpause >= delay:
+            self.sinpause = 0
+            self.sinframe += 1
+            if self.sinframe >= 50:
+                self.sinframe = 0           
+        dy = (-(modifier*(math.sin)(self.sinframe))) 
+        return dy * 1000
        
     def die(self):
         """if curent image is dead, moves self offscreen after animation plays."""
@@ -90,6 +106,7 @@ class Boss(baddie.Baddie):
             self.rect.x = -1000
                 
     def update(self, time_delta):
+        #print self.sine_wave()* time_delta
         if self.currentimage == self.imgdead:
             self.die()
         if self.scene.foreground_map.at_end == True:
@@ -106,6 +123,7 @@ class Boss(baddie.Baddie):
                 self.movement_count -=1 #* time_delta
                             
             self.rect.x += self.dx* time_delta
+            #self.rect.y += self.sine_wave() #* time_delta
             #the order here is important or the collidemask won't work for the flipped sprite
             self.animation(time_delta)
             if self.scene.scroll_to_left :

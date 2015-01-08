@@ -18,12 +18,15 @@ import label
 import baddie_movement
 import prepare
 
+
 #TODO:
-# BOSS
+#make enemy movement work with time_delta
+# BOSS MOVMENT
 #DIFFICULTY SHOULD INCREASE
 #add pause
-#WHAT DID WE LEARN:
+
 #put all music in startup EXCEPT that for first scene.
+
 
 
 
@@ -34,12 +37,13 @@ class gamePlay(scene.Scene):
         self.next = "ENDING"
         self.init_variables()
         self.init_objects()   
-    
+        
+       
     def init_variables(self):
         """ init all variables needed in scene"""
         self.speed = self.MASTER_SPEED * 3
         self.scroll_to_left = True
-        self.number_of_baddies = 50
+        self.number_of_baddies = 100
         
         self.number_of_powerups = 3
         self.number_of_bullets = 30
@@ -219,7 +223,7 @@ class gamePlay(scene.Scene):
                 self.bullet_order = 0
             else:         
                 self.bullet_order += 1
-                
+                     
     def bullet_baddie_collision(self):
         """checks to see if bullet has llided with an enemy. Sets enemy to dead."""
         for b in self.bullets:
@@ -238,7 +242,7 @@ class gamePlay(scene.Scene):
                                   
     def check_for_combo(self, collidedbaddie):
         """kills other enemies in same line as enemy killed."""        
-        if collidedbaddie.list_index == 0:
+        if collidedbaddie.list_index == collidedbaddie.magic_index:
             for b in self.baddies:
                 if b.list_id == collidedbaddie.list_id: 
                     if b.currentimage is not b.imgdead:
@@ -359,7 +363,8 @@ class gamePlay(scene.Scene):
             
     def quit_to_title(self):
         self.done = True
-           
+               
+    
     def update_specifics(self, time, time_delta): 
         """things that need to be updated in individual scenes"""        
         self.collisiontimer -=1
@@ -387,8 +392,10 @@ class gamePlay(scene.Scene):
             self.handle_dead_menu()
         if self.boss_dead == True:
             self.end_wave()
-        for b in self.baddie_lists:
-            b.update()
+        for b in self.baddie_lists:            
+            b.update(time_delta)
+            
+    
                 
         
 def main():

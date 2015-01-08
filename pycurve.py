@@ -145,8 +145,8 @@ class Bspline(object):
         self._deboor() # re-evaluate
 
 ################################################################################
-def make_b_spline(scene, P):
-    STEP_N = int((scene.field_length/2)- scene.wave_number*20)
+def make_b_spline(RESOLUTION, P):
+    STEP_N = int((RESOLUTION[0]/2))
     
     
     
@@ -159,7 +159,7 @@ def make_b_spline(scene, P):
 
     S = Bspline(P, t, k)
     # insert a knot (just to demonstrate the algorithm is working)
-    S.insert(0.9)
+    #S.insert(0.9)
 
     patharray = []
     

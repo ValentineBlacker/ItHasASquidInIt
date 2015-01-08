@@ -77,7 +77,7 @@ class Control(object):
         while not self.done:            
             self.event_loop()
             time_delta = self.clock.tick(self.fps)/1000.0
-            pygame.display.set_caption(str(self.clock.get_fps()))
+            #pygame.display.set_caption(str(self.clock.get_fps()))
             self.update(time_delta)  
             pygame.display.flip()    
             self.time = pygame.time.get_ticks()/self.fps          

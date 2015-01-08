@@ -4,7 +4,7 @@ Created on Oct 31, 2014
 @author: DemiCow
 '''
 import random
-import pycurve
+import prepare
 
 class baddie_List:
     def __init__(self, scene, baddie_list, list_id):
@@ -16,7 +16,8 @@ class baddie_List:
             x.list_index = self.baddie_list.index(x)  
         self.reset()
         
-    def update(self):      
+           
+    def update(self, time_delta):      
         self.movement_counter += 1  
         if self.movement_counter > self.startmovement:
             #calculates when last member has gone offscreen
@@ -36,13 +37,13 @@ class baddie_List:
                                 x.rect.x, x.rect.y = self.path[(self.movement_counter-self.startmovement)- self.baddie_list.index(x)*50]
                         
     def reset(self):
-        self.paths = [pycurve.make_b_spline(self.scene,pycurve.PATHS[pycurve.PATHS.index(x)]) for x in pycurve.PATHS]
-        self.path = self.paths[random.randrange(0,len(self.paths))]        
+        magic_index = random.randrange(0, len(self.baddie_list)-1)
+        self.path = prepare.PATHS[random.randrange(0,len(prepare.PATHS))]        
         self.startmovement = random.randrange\
-                        (0,(self.scene.field_length*1.5)- (self.scene.wave_number* 50))          
+                        (0,(self.scene.field_length*3)- (self.scene.wave_number* 50))          
         self.movement_counter = 0
         for x in self.baddie_list:
-            x.dead = False    
-                  
+            x.dead = False 
+            x.magic_index = magic_index                     
             x.reset()
             

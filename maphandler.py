@@ -4,7 +4,7 @@ Created on Aug 8, 2014
 @author: DemiCow
 '''
 import pygame
-
+import prepare
 #CREDIT FOR PORTIONS OF MAP CODE: Christopher Breinholt (BreinyGames). 
 #Link to orginal code not available.
 
@@ -35,20 +35,23 @@ class ScrollingMap:
         if self.maptype == 'background':           
             #background tile half the length of foreground tile, scrolls half as fast. 
             self.speed = (self.speed//2)
-            self.tileset= pygame.image.load\
-                            ("images/maps/{0}background.png".format 
-                            (imagedict[self.scene.wave_number])).convert_alpha()            
+            self.tileset= prepare.MAPS['{0}background'.format(imagedict[self.scene.wave_number])]
+            #pygame.image.load\
+                            #("images/maps/{0}background.png".format 
+                            #(imagedict[self.scene.wave_number])).convert_alpha()            
             
         elif self.maptype == 'foreground':  
-            self.tileset = pygame.image.load\
-                            ("images/maps/{0}foreground.png".format 
-                            (imagedict[self.scene.wave_number])).convert_alpha()            
+            self.tileset = prepare.MAPS['{0}foreground'.format(imagedict[self.scene.wave_number])]
+                            #pygame.image.load\
+                            #("images/maps/{0}foreground.png".format 
+                            #(imagedict[self.scene.wave_number])).convert_alpha()            
         
         elif self.maptype == 'splash':
             self.speed = 0
-            self.tileset = pygame.image.load\
-                           ("images/maps/cutscene{0}.png".format 
-                            (self.scene.wave_number)).convert_alpha()        
+            self.tileset =  prepare.MAPS['cutscene{0}'.format(self.scene.wave_number)]
+
+            
+            #                              
             
         self.tile_size = self.tileset.get_size()    
         self.tile_size_x = self.tile_size[0]

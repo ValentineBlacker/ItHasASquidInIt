@@ -23,7 +23,7 @@ class ScrollingMap:
     Map can be any number of tiles wide or high."""
     def __init__(self, scene, maptype):
         self.scene = scene  
-        #this is the number of tiles making up the background- 0 for this game
+        #this is the number of tiles making up the background- 4
         self.map_width, self.map_height = 4, 1
         self.screen = scene.screen
         self.maptype = maptype
@@ -35,16 +35,11 @@ class ScrollingMap:
         if self.maptype == 'background':           
             #background tile half the length of foreground tile, scrolls half as fast. 
             self.speed = (self.speed//2)
-            self.tileset= prepare.MAPS['{0}background'.format(imagedict[self.scene.wave_number])]
-            #pygame.image.load\
-                            #("images/maps/{0}background.png".format 
-                            #(imagedict[self.scene.wave_number])).convert_alpha()            
+            self.tileset= prepare.MAPS['{0}background'.format(imagedict[self.scene.wave_number])]              
             
         elif self.maptype == 'foreground':  
             self.tileset = prepare.MAPS['{0}foreground'.format(imagedict[self.scene.wave_number])]
-                            #pygame.image.load\
-                            #("images/maps/{0}foreground.png".format 
-                            #(imagedict[self.scene.wave_number])).convert_alpha()            
+                                    
         
         elif self.maptype == 'splash':
             self.speed = 0

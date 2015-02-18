@@ -71,25 +71,25 @@ class Boss(baddie.Baddie):
             self.rect.left =  self.scene.field_length - 20
         else: 
             self.rect.right = -20
-        self.rect.bottom = self.scene.field_height
+        self.rect.bottom = self.scene.field_height - 100
         
-        self.movement_length = 300
+        self.movement_length = 200
         self.movement_count = self.movement_length  
         
     
     def movement(self):
         "moves boss back and forth"
-        if self.movement_count < self.movement_length  and self.movement_count > 100:  
-            return -self.scene.speed
-        elif self.movement_count < 0 and self.movement_count > -self.movement_length +100 :
-            return self.scene.speed
+        if self.movement_count <= self.movement_length  and self.movement_count >= 100:  
+            return -4#self.scene.speed
+        elif self.movement_count <= 0 and self.movement_count >= -self.movement_length +100 :
+            return 4#self.scene.speed
         else: return 0
     
     def sine_variables(self):
         self.sinpause = 0     
         self.sinframe = 0    
         
-    def sine_wave(self, delay = 100, modifier = 100):        
+    def sine_wave(self, delay = 50, modifier = 6):        
         #frame is x. yposition = sin(x)
         self.sinpause += 1
         if self.sinpause >= delay:
@@ -97,8 +97,8 @@ class Boss(baddie.Baddie):
             self.sinframe += 1
             if self.sinframe >= 50:
                 self.sinframe = 0           
-        dy = (-(modifier*(math.sin)(self.sinframe))) 
-        return dy * 1000
+        dy = int(-(modifier*(math.sin)(self.sinframe))) 
+        return dy #*20 (* time_delta)
        
     def die(self):
         """if curent image is dead, moves self offscreen after animation plays."""
@@ -106,7 +106,7 @@ class Boss(baddie.Baddie):
             self.rect.x = -1000
                 
     def update(self, time_delta):
-        #print self.sine_wave()* time_delta
+        
         if self.currentimage == self.imgdead:
             self.die()
         if self.scene.foreground_map.at_end == True:
@@ -120,10 +120,9 @@ class Boss(baddie.Baddie):
                 self.shootable = True
                 if self.movement_count< -self.movement_length :
                     self.movement_count = self.movement_length
-                self.movement_count -=1 #* time_delta
-                            
-            self.rect.x += self.dx* time_delta
-            #self.rect.y += self.sine_wave() #* time_delta
+                self.movement_count -=1 #* time_delta                          
+            self.rect.x += self.dx#* time_delta
+            self.rect.y += self.sine_wave(self.scene.wave_number*10 + 10)#bottom = self.sine_wave() + (self.scene.field_height - 100)
             #the order here is important or the collidemask won't work for the flipped sprite
             self.animation(time_delta)
             if self.scene.scroll_to_left :

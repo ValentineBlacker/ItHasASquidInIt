@@ -10,7 +10,6 @@ try:
     import android
 except ImportError:
     android = None
-#TIME time delta
 
 
 class Squid(pygame.sprite.DirtySprite):
@@ -25,10 +24,9 @@ class Squid(pygame.sprite.DirtySprite):
         
         self.pause = 0
         self.frame = 0   
-        self.delay = 500       
+        self.delay = 800       
         self.imgsize = (75, 75)
-        self.reset()
-        self.maxspeed = self.scene.speed * 3
+        self.reset()        
         if android:
             android.accelerometer_enable(True)
             
@@ -55,9 +53,7 @@ class Squid(pygame.sprite.DirtySprite):
              
         self.dead = False
         self.position = self.rect.center
-        self.dy = 3
-        if self.scene.scroll_to_left == True:
-            self.dx = 1
+      
         
         
     def load_images(self):        
@@ -116,27 +112,8 @@ class Squid(pygame.sprite.DirtySprite):
             tmpimg.blit(imagemaster, (0, 0), (offsetsquidge[i], self.imgsize))            
             self.imgsquidge.append(tmpimg)
         
-       
-    def enforce_speed_limit(self):    
-        if abs(self.dx) > self.maxspeed:
-            if self.dx > 0:
-                self.dx = self.maxspeed
-            else: self.dx = - self.maxspeed
+          
             
-        if abs(self.dy) > self.maxspeed:
-            if self.dy > 0:
-                self.dy = self.maxspeed
-            else: self.dy = -self.maxspeed
-        if self. dx > 0:
-            self.dx -= .1
-        elif self.dx < 0:
-            self.dx += .1
-        if self.dy > 0:
-            self.dy -=.1
-        elif self.dy < 0:
-            self.dy += .1
-            
-    
         
     def animation(self, time_delta):        
         self.pause += 1        
@@ -147,25 +124,19 @@ class Squid(pygame.sprite.DirtySprite):
                 self.frame = 0               
         self.image = self.currentimage[self.frame]
         
-    def update(self, time_delta):   
-        #delay is shorter the faster squid moves
-        self.delay = 500 - abs(((self.dx * time_delta) + (self.dy * time_delta))/2)* 60           
-        self.check_bounds()
-        self.enforce_speed_limit()
+    def update(self, time_delta):          
         
-        self.rect.x += self.dx* time_delta
-        self.rect.y += self.dy  * time_delta
-                       
+        self.check_bounds()
+                                
         if self.dead == True:
             self.image = self.imgdead 
             self.dy = -1
             
-        elif self.scene.collisiontimer > 0 and self.currentimage is not self.imgshield:
+        elif self.scene.time - self.scene.collision_time < self.scene.short_time*time_delta:            
             self.image = self.imgdamage
         else:
-            self.animation(time_delta)
-        
-            if self.scene.shield_counter > 0:     
+            self.animation(time_delta)              
+            if self.scene.time - self.scene.shield_time < self.scene.short_time*time_delta :    
                 self.currentimage = self.imgshield                
             else: self.currentimage = self.imgmoving
                 

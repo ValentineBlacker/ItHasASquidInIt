@@ -18,25 +18,23 @@ class LifeDot(pygame.sprite.DirtySprite):
         
         self.image = self.imagemaster
         self.rect = self.image.get_rect()
-        
-        hud_top = self.scene.hudrect.top
-        hud_left = self.scene.hudrect.left
+        self.hudrect = pygame.rect.Rect(10,10,100,40)
+        hud_top = self.hudrect.top
+        hud_left = self.hudrect.left
         
         self.rect.center =(hud_left+20 + self.imgsize[0]*pos,
                             hud_top + 20)
-        
-        self.position = self.rect.center
-        
     
                 
     def load_images(self):
         imgmaster = prepare.IMAGES['icon']     
-        self.imgsize = (32, 32)
-        
+        self.imgsize = (32, 32)        
         self.imagemaster = pygame.Surface(self.imgsize, pygame.SRCALPHA)        
         self.imagemaster.blit(imgmaster, (0, 0), ((0,0), self.imgsize))  
     
     def update(self, time_delta):
+        pygame.draw.rect(self.scene.screen, 
+                             pygame.color.Color("black"), self.hudrect, 5) 
         self.scene.screen.blit(self.imagemaster, (self.rect.x, self.rect.y), special_flags= 0)
         
         

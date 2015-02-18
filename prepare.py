@@ -87,6 +87,7 @@ SCREEN = pygame.display.set_mode(RESOLUTION)
 SCREEN_RECT = SCREEN.get_rect()
 MASTER_SPEED = 36
 FPS = 60
+MUSIC_ON = False
 #Resource loading
 
 SOUNDS = load_all_sounds(os.path.join('sounds'))

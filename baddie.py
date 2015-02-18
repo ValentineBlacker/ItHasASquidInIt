@@ -32,9 +32,7 @@ class Baddie(squid.Squid):
                           2: ['spidy', 'waxy', 'qbee'],
                           3: ['dollface', 'lucy', 'sylvie']
                           }
-        #default sprite attributes
-        self.sinpause = 0     
-        self.sinframe = 0    
+        #default sprite attributes            
         self.pause = 0
         self.delay = 400
         self.movement_counter = None
@@ -102,32 +100,7 @@ class Baddie(squid.Squid):
         if self.frame >= self.number_of_frames-1:
             self.dead = True
             self.reset()
-            #if self.scene.boss_dead == False:                
                 
-            #else: self.rect.center = (9000,9000)
-          
-            
-    def determine_movement(self):
-        """randomly modifies curvy path"""
-        self.move_delay = (random.randrange(5,15))
-        self.sin_modifier = (random.randrange(0,self.scene.wave_number+4)) 
-        self.sin_counter = (random.randrange(50,60)) 
-        
-     
-    def movement(self):
-        """creates sine wave path in y axis"""
-        #frame is x. yposition = sin(x)
-        if self.startmovement < 0:
-            delay = self.move_delay     
-            self.sinpause += 1
-            if self.sinpause >= delay:
-                self.sinpause = 0    
-                self.sinframe += 1
-                if self.sinframe >= 50:
-                    self.sinframe = 0           
-            self.dy = (-(self.sin_modifier*(math.sin)(self.sinframe)))  
-            
-    
    
     def reset(self):
         """"calls when object created and at start of each wave.

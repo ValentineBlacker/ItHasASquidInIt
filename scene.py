@@ -33,7 +33,8 @@ class Control(object):
         self.time = 0
          
         self.done = False 
-    
+        self.pause = False
+            
     def setup_states(self, state_dict, start_state):
         """Given a dictionary of States and a State to start in,
         builds the self.state_dict."""
@@ -60,17 +61,35 @@ class Control(object):
         self.state.startup(self.time, persist)
         self.state.previous = previous
         
-        
+    def quit(self):
+        self.done = True               
+        pygame.quit() 
+        if not android: 
+            sys.exit(0)
+     
     def event_loop(self):
         """events- mouse click, escape to exit game. squid controlled by mouse if not android"""
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: # event.key == pygame.K_ESCAPE or 
-                self.done = True               
-                pygame.quit() 
-                if not android: 
-                    sys.exit(0) 
-            
+            if event.type == pygame.QUIT:
+                self.quit()
+            elif event.type == pygame.KEYUP:
+                if event.key == pygame.K_ESCAPE:
+                    self.quit()
+                if event.key == pygame.K_p:
+                    self.toggle_poggle()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 3:
+                    self.toggle_poggle()
             self.state.get_event(event)
+            
+    def toggle_poggle(self):
+        if self.pause == True:
+            self.pause = False
+            pygame.display.set_caption(prepare.CAPTION)
+        else: 
+            self.pause = True
+            pygame.display.set_caption("PAUSED")
+            
             
     def main(self):
         """Main loop for entire program."""
@@ -78,7 +97,8 @@ class Control(object):
             self.event_loop()
             time_delta = self.clock.tick(self.fps)/1000.0
             #pygame.display.set_caption(str(self.clock.get_fps()))
-            self.update(time_delta)  
+            if not self.pause:
+                self.update(time_delta)  
             pygame.display.flip()    
             self.time = pygame.time.get_ticks()/self.fps          
             if android:
@@ -123,6 +143,12 @@ class Scene(object):
         self.next = None
         self.previous = None
         self.persist = {}
+        
+        #variables to standardize timing across game
+        self.micro_time = 500
+        self.short_time = 15000
+        self.mid_time = 65000
+        self.long_time = 105000
         
     def startup(self, time, persistant):
         """Add variables passed in persistant to the proper attributes and

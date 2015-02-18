@@ -13,8 +13,8 @@ class Label(pygame.sprite.DirtySprite):
         
         pygame.sprite.DirtySprite.__init__(self)     
         self.scene = scene 
-        self.int_to_roman = {0: 'zero', 1: "one", 2: 'two', 3: "three", 4: "four",
-                             5: "five", 6: "six", 7: "seven", 8: "eight"}
+        self.int_to_roman = {0: 'eight', 1: "seven", 2: 'six', 3: "five", 4: "four",
+                             5: "three", 6: "two", 7: "one", 8: "zero"}
         self.font = pygame.font.Font(font_name, font_size)
         self.textlines = ["wooooo"]
         self.transparent_color = pygame.color.Color("gray8")

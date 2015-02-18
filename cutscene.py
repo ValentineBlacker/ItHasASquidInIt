@@ -28,11 +28,14 @@ class Cutscene0(scene.Scene):
         
         self.title_time = self.time      
         self.wave_number = 0
-        self.collisiontimer = 0
-        self.shield_counter = 0
+        #self.collisiontimer = 0
+        #self.shield_counter = 0
+        self.shield_time = -100
+        self.collision_time = -100
         self.click_counter = 5
         self.text_delay = 100
         self.secret_line = True
+        
                      
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
@@ -62,7 +65,7 @@ class Cutscene0(scene.Scene):
                                   ]
             
         else: 
-            self.tutorialtext = [
+            self.tutorialtext = [ 
                                   ['"Fate is a sea without shore,' ],
                                    ['and the soul is a rock that abides;'],
                                    ['But her ears are vexed with the roar '],
@@ -80,9 +83,10 @@ class Cutscene0(scene.Scene):
                         self.tutorial]  
         
     def startup(self, time, persistant): 
-        self.ocean_noises.play(loops=-1)
-        self.seagull_noises.play(loops=-1)         
-        self.start_time = time
+        if prepare.MUSIC_ON == True:
+            self.ocean_noises.play(loops=-1)
+            self.seagull_noises.play(loops=-1)         
+        self.start_time = time        
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
@@ -98,15 +102,19 @@ class Cutscene0(scene.Scene):
             self.squid.rect.x += 2
             self.squid.rect.y += 1
         else: pass
-        
+        if self.clicked ==True:
+            if prepare.MUSIC_ON == True:
+                self.click_sound.play()
+                self.start_time= self.time
                 
-        if self.clicked ==True and self.click_counter < 0 or self.click_counter < -self.text_delay:
-            self.click_sound.play()
-            self.click_counter = 30   
-            self.linecounter += 1                 
+        if self.clicked ==True and self.time - self.start_time > 100000*time_delta:#self.click_counter < -self.text_delay:            
+            self.click_counter = 100
+            self.start_time = self.time
+            self.linecounter += 1    
             if self.linecounter == len(self.tutorialtext):
-                self.ocean_noises.fadeout(1000)
-                self.seagull_noises.fadeout(1000)
+                if prepare.MUSIC_ON == True:
+                    self.ocean_noises.fadeout(1000)
+                    self.seagull_noises.fadeout(1000)
                 self.done = True
             else:
                 self.tutorial.image.fill(self.tutorial.fillcolor)
@@ -117,12 +125,15 @@ class Cutscene1(scene.Scene):
     def __init__(self):        
         scene.Scene.__init__(self)
         self.next = "TITLE"
+        self.init_variables()
+        self.init_objects()  
 
     
     def init_objects(self):
         """ creates objects needed in specfic scenes"""
-        self.speed = self.MASTER_SPEED
-       
+        self.collision_time = -100
+        self.shield_time = -100
+        self.speed = self.MASTER_SPEED       
         self.label = label.Label(self, font_size = 50)
         self.label.textlines = ["THANK YOU FOR PLAYING", "IT HAS A SQUID IN IT"]
         self.menu = label.Label(self, font_size = 50)
@@ -136,7 +147,7 @@ class Cutscene1(scene.Scene):
         self.background.fill(pygame.color.Color("black"))
         self.screen.blit(self.background, (0, 0))
         self.sprites = [self.label, self.menu]
-        self.click_sound = pygame.mixer.Sound(prepare.SOUNDS['157539__nenadsimic__click.wav'])
+        self.click_sound = pygame.mixer.Sound(prepare.SOUNDS['157539__nenadsimic__click'])
         
         
     def mouse_controls(self, time_delta):
@@ -144,7 +155,7 @@ class Cutscene1(scene.Scene):
            
     
     def startup(self, time, persistant):
-        self.start_time = time
+        self.start_time = time        
         return scene.Scene.startup(self, time, persistant)
     
     def cleanup(self):        
@@ -157,7 +168,9 @@ class Cutscene1(scene.Scene):
         """update title screen""" 
         if self.clicked ==True:
             if self.menu.option_highlighted == 0:
-                self.click_sound.play()
+                if prepare.MUSIC_ON == True:
+                    self.click_sound.play()
+                
                 self.done = True
         
     
@@ -165,12 +178,12 @@ class Cutscene1(scene.Scene):
 def main():
     pygame.init()
     pygame.mixer.init()
-    #import gameplay
-    #import title
+    import gameplay
+    import title
     run_it = scene.Control()
-    state_dict = {#"TITLE" : title.Title(),
+    state_dict = {"TITLE" : title.Title(),
                   "INTRO" : Cutscene0(),
-                  #"GAMEPLAY" : gameplay.gamePlay(),
+                  "GAMEPLAY" : gameplay.gamePlay(),
                   "ENDING": Cutscene1()
                    }
     run_it.setup_states(state_dict, "INTRO")

@@ -47,17 +47,17 @@ class gamePlay(scene.Scene):
         
         self.number_of_powerups = 3
         self.number_of_bullets = 30
-        self.wave_number = 3
+        self.wave_number = 0
         #the shooting speed number is the delay between bullets. a LOWER number means the bullets fire faster.
-        self.shooting_speed = 30000
+        self.shooting_speed = self.long_time/2
         self.default_shooting_speed = self.shooting_speed 
-        self.powerup_shooting_speed = self.shooting_speed  / 4 #also the minimum speed           
+        self.powerup_shooting_speed = self.shooting_speed  *.9 #also the minimum speed           
         
         self.maxlife = 3
         self.life = self.maxlife
         self.bullet_order = 0
         #timers!
-        self.shield_time = self.time - 100   
+        self.shield_time = self.time - 10000   
         self.collision_time = self.time-100
         self.bullet_time = self.time      
         self.bullet_power_time = self.time                  
@@ -93,6 +93,7 @@ class gamePlay(scene.Scene):
         self.bulletGroup = self.make_sprite_group(self.bullets)
         self.add_group(self.bulletGroup)
         
+        self.hudrect = pygame.rect.Rect(10,10,100,40)
         self.lifedots = [lifedot.LifeDot(self, n) for n in range(self.maxlife)]        
         self.lifeGroup = self.make_sprite_group(self.lifedots)
         self.add_group(self.lifeGroup)  
@@ -123,6 +124,7 @@ class gamePlay(scene.Scene):
         self.sprites = [self.background_map, self.foreground_map, self.squid, self.boss, self.baddieGroup,  
                         self.powerupGroup, self.bulletGroup, self.lifeGroup, self.label, self.scorelabel,self.continuelabel]  
         
+                
        
         
     def create_baddie_lists(self):
@@ -163,7 +165,7 @@ class gamePlay(scene.Scene):
     def hurt_squid(self, time_delta):      
         "hurts squid, kills it if life goes BELOW 0"  
         self.squid.dx = self.squid.dy = 0
-        if self.time - self.shield_time > self.mid_time*time_delta: 
+        if self.squid.currentimage is not self.squid.imgshield: 
             self.life = self.life - 1
             if prepare.MUSIC_ON == True:
                 self.squid_damage_sound.play()
@@ -202,7 +204,7 @@ class gamePlay(scene.Scene):
             if self.time- self.collision_time > self.short_time*time_delta:               
                 self.vibrate(.3)
                 self.collision_time = self.time  
-                self.hurt_squid()
+                self.hurt_squid(time_delta)
         
         
     def squid_killed(self): 
@@ -222,7 +224,7 @@ class gamePlay(scene.Scene):
             bullet._set_visible(True)           
             bullet.is_fired (self.squid.rect.centerx, self.squid.rect.centery, time_delta)                 
            
-            if self.time - self.bullet_power_time > self.mid_time * time_delta:
+            if self.time - self.bullet_power_time > (self.long_time*4) * time_delta:
                 self.bullettimer = self.shooting_speed * time_delta
                 self.bullet_time = self.time
             else: 
@@ -265,7 +267,7 @@ class gamePlay(scene.Scene):
         baddie.frame = 0
         baddie.currentimage = baddie.imgdead
         if self.shooting_speed > self.powerup_shooting_speed:
-            self.shooting_speed = self.shooting_speed - self.shooting_speed/30
+            self.shooting_speed = self.shooting_speed - self.shooting_speed/20
         else: pass
     
     def bullet_boss_collision(self):
@@ -390,7 +392,7 @@ class gamePlay(scene.Scene):
             self.handle_bullets(time_delta)
             self.bullet_baddie_collision()
         self.accelerometer_controls()      
-        if self.time - self.start_time > self.mid_time*time_delta:
+        if self.time - self.start_time > (self.long_time*4)*time_delta:
             self.label.toggle_visible(False)
             self.squid_controllable = True
             
@@ -405,6 +407,9 @@ class gamePlay(scene.Scene):
             self.end_wave(time_delta)
         for b in self.baddie_lists:            
             b.update(time_delta)
+            
+        pygame.draw.rect(self.screen, 
+                             pygame.color.Color("black"), self.hudrect, 5) 
             
     
                 

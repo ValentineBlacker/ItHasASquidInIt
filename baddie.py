@@ -30,7 +30,8 @@ class Baddie(squid.Squid):
         self.wave_dict = {0 : ['l_fish','b_fish','q_fish'], 
                           1: ['mothfish', 'ecto', 'strix'],
                           2: ['spidy', 'waxy', 'qbee'],
-                          3: ['dollface', 'lucy', 'sylvie']
+                          3: ['dollface', 'lucy', 'sylvie'],
+                          4: ['l_fish']
                           }
         #default sprite attributes            
         self.pause = 0
@@ -38,10 +39,14 @@ class Baddie(squid.Squid):
         self.movement_counter = None
         self.list_id = 0
         self.list_index = 0
+        self.magic_index = 1
         self.reset()
                 
     def load_images(self):       
         self.imgmaster = prepare.BADDIES[self.name]
+        if self.list_index == self.magic_index:
+            self.imgmaster = self.shaded_image(self.imgmaster, (255,0,255))
+        else: pass
     
         #intial placeholder image
         self.imgstand = pygame.Surface(self.image_size, pygame.SRCALPHA)        
@@ -73,6 +78,17 @@ class Baddie(squid.Squid):
         else:
             return True
     
+    def ghost_image(self, image, color):
+        shaded = image.copy()
+        shaded.fill(color, special_flags=pygame.BLEND_RGBA_MULT)
+        return shaded
+
+    def shaded_image(self,image, color):
+        copied = image.copy()
+        ghost = self.ghost_image(image, color)
+        copied.blit(ghost, (0,0))
+        return copied
+    
                   
     def update(self, time_delta):     
         #SAVE PNGS AT 8 BIT  
@@ -83,16 +99,12 @@ class Baddie(squid.Squid):
             if self.scene.scroll_to_left == True:
                 self.flip()
             
-                if self.hit == True :
-                    self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
-                    self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 2) 
-                    self.hit = False
-                else: 
-                    if self.list_index == self.magic_index:
-                        self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
-                        self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 1)                        
-                    else: self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
-              
+            if self.hit == True :
+                self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
+                self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 2) 
+                self.hit = False
+            else: self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
+            
             
                
     def die(self):

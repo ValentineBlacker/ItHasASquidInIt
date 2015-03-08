@@ -90,12 +90,12 @@ FPS = 60
 MUSIC_ON = False
 #Resource loading
 
-SOUNDS = load_all_sounds(os.path.join('sounds'))
-IMAGES = load_all_images(os.path.join("images/misc"))
-BADDIES = load_all_baddies(os.path.join("images/baddies"))
-BOSSES = load_all_bosses(os.path.join("images/bosses"))
-MAPS = load_all_maps(os.path.join("images/maps"))
-FONT = "images/misc/Nobile-Regular.ttf"
+SOUNDS = load_all_sounds(os.path.join('data/sounds'))
+IMAGES = load_all_images(os.path.join("data/images/misc"))
+BADDIES = load_all_baddies(os.path.join("data/images/baddies"))
+BOSSES = load_all_bosses(os.path.join("data/images/bosses"))
+MAPS = load_all_maps(os.path.join("data/images/maps"))
+FONT = "data/images/misc/Nobile-Regular.ttf"
 PATHS = [pycurve.make_b_spline(RESOLUTION,pycurve.PATHS[pycurve.PATHS.index(x)]) for x in pycurve.PATHS]
 
 img_icon = IMAGES['icon']

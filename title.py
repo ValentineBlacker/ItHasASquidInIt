@@ -9,6 +9,31 @@ import squid
 import label
 import prepare
 
+class tutorialImage (pygame.sprite.DirtySprite):
+
+    def __init__(self, scene):        
+        pygame.sprite.DirtySprite.__init__(self)                        
+        self.screen = scene.screen      
+        self.imagesize = (1280,670)           
+        self.imagemaster = prepare.IMAGES['howtoplaysplash']   
+        
+         
+        self.imagestill = pygame.Surface(self.imagesize, pygame.SRCALPHA)        
+        self.imagestill.blit(self.imagemaster, (0, 0), ((0,0), self.imagesize))  
+        self.image = self.imagestill   
+        self.rect = self.image.get_rect() 
+        self.rect.y = 0
+        self.toggle(False)          
+              
+    def toggle(self, visible):
+        if visible == True:
+            self.rect.x = 0#prepare.RESOLUTION[0]/2
+        else: self.rect.centerx = -9000
+            
+    def update(self, time_delta):        
+        self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)
+        
+
 class Title(scene.Scene):
     
     def __init__(self):        
@@ -34,21 +59,24 @@ class Title(scene.Scene):
         self.squid.rect.center = (600,400)
         self.squid.currentimage = self.squid.imgtitle
         self.squid.dy = 0
-        #self.squid.delay = 12
+        
         self.squid.number_of_frames = 9
         self.label = label.Label(self)
         self.label.textlines = ["it has a squid in it"]
-        self.menu = label.Label(self, font_size = 50)
+        self.menu = label.Label(self, font_size = 45)
         self.menu_phase = 0
         self.set_menu_lines()
-        
         self.menu.clickable = True
         self.menu.rect.y += 300
+        
+        self.tutorial = tutorialImage(self)
+        
         self.background = pygame.Surface(self.screen.get_size())
         self.backgroundrect = self.background.get_rect()
         self.background.fill(pygame.color.Color("black"))
         self.screen.blit(self.background, (0, 0))
-        self.sprites = [self.label, self.menu,self.squid]
+        
+        self.sprites = [self.label ,self.squid, self.tutorial, self.menu]
         
         self.click_sound = pygame.mixer.Sound(prepare.SOUNDS['157539__nenadsimic__click'])        
                
@@ -68,8 +96,12 @@ class Title(scene.Scene):
         if self.menu_phase == 0:
             if self.android:
                 self.menu.textlines = ["touch to begin", "options"]
-            else: self.menu.textlines = ["click to begin", "options"]
+            else: self.menu.textlines = ["start game","how to play", "options"]
+        
         elif self.menu_phase == 1:
+            self.menu.textlines = [ 'back']    
+                   
+        elif self.menu_phase == 2:
             self.menu.textlines = ["music {0}".format(options_dict[prepare.MUSIC_ON]), "back"]            
            
     def mouse_controls(self, time_delta):        
@@ -111,22 +143,37 @@ class Title(scene.Scene):
             else: pass        
                 
         if self.clicked ==True and self.time - self.click_time > self.short_time* time_delta:        
+            
             if self.menu_phase == 0:
                 if self.menu.option_highlighted == 0:
                     if prepare.MUSIC_ON == True:
                         self.click_sound.play()
                         pygame.mixer.stop()              
-                    self.done = True
+                    self.done = True                    
                 elif self.menu.option_highlighted == 1:                    
-                    self.menu_phase = 1                    
+                    self.menu_phase = 1
                     self.set_menu_lines()
+                    self.tutorial.toggle(True) 
+                    self.menu.rect.y += 150               
+                elif self.menu.option_highlighted == 2:
+                    self.menu_phase = 2                    
+                    self.set_menu_lines()
+                    
             elif self.menu_phase == 1:
+                if self.menu.option_highlighted == 0:
+                    self.tutorial.toggle(False)
+                    self.menu_phase = 0    
+                    self.set_menu_lines()
+                    self.menu.rect.y -= 150
+                    
+            elif self.menu_phase == 2:
                 if self.menu.option_highlighted == 0:
                     self.toggle_music()                    
                     self.set_menu_lines()
                 elif self.menu.option_highlighted == 1:
                     self.menu_phase = 0
                     self.set_menu_lines()
+                    
             self.click_time= self.time
             
     

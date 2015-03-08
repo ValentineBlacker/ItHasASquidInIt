@@ -148,7 +148,7 @@ class Scene(object):
         self.micro_time = 500
         self.short_time = 15000
         self.mid_time = 65000
-        self.long_time = 105000
+        self.long_time = 185000
         
     def startup(self, time, persistant):
         """Add variables passed in persistant to the proper attributes and

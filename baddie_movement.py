@@ -40,7 +40,7 @@ class baddie_List:
         magic_index = random.randrange(0, len(self.baddie_list)-1)
         self.path = prepare.PATHS[random.randrange(0,len(prepare.PATHS))]        
         self.startmovement = random.randrange\
-                        (0,(self.scene.field_length*3)- (self.scene.wave_number* 50))   
+                        (0,(self.scene.field_length*4)- (self.scene.wave_number* 50))   
         if self.scene.foreground_map.at_end == True:
             self.startmovement = self.startmovement * 2
                    

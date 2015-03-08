@@ -18,7 +18,7 @@ class LifeDot(pygame.sprite.DirtySprite):
         
         self.image = self.imagemaster
         self.rect = self.image.get_rect()
-        self.hudrect = pygame.rect.Rect(10,10,100,40)
+        self.hudrect = self.scene.hudrect
         hud_top = self.hudrect.top
         hud_left = self.hudrect.left
         
@@ -33,8 +33,7 @@ class LifeDot(pygame.sprite.DirtySprite):
         self.imagemaster.blit(imgmaster, (0, 0), ((0,0), self.imgsize))  
     
     def update(self, time_delta):
-        pygame.draw.rect(self.scene.screen, 
-                             pygame.color.Color("black"), self.hudrect, 5) 
+        
         self.scene.screen.blit(self.imagemaster, (self.rect.x, self.rect.y), special_flags= 0)
         
         

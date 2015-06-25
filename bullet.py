@@ -72,7 +72,7 @@ class Bullet(pygame.sprite.DirtySprite):
    
     def check_bounds(self):
         if self.rect.x > self.screen.get_width() or self.rect.x < 0:
-            self.reset()
+            self.kill()#reset()
             return False
         else: return True
              

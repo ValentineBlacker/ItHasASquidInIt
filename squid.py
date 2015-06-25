@@ -130,18 +130,19 @@ class Squid(pygame.sprite.DirtySprite):
                                 
         if self.dead == True:
             self.image = self.imgdead 
-            self.dy = -1
+            self.rect.y += -1
             
         elif self.scene.time - self.scene.collision_time < self.scene.short_time*time_delta:
             if self.currentimage is not self.imgshield:            
-                self.image = self.imgdamage
-            else: pass
+                self.image = self.imgdamage                
+            else: self.scene.collision_time = self.scene.time = 10000
         else:
             self.animation(time_delta)              
             if self.scene.time - self.scene.shield_time < (self.scene.long_time*2)*time_delta :    
                 self.currentimage = self.imgshield                
-            else: self.currentimage = self.imgmoving
-                
+            else: 
+                self.currentimage = self.imgmoving
+                self.scene.shield_time = self.scene.time - 100000
         self.screen.blit(self.image, (self.rect.x, self.rect.y), special_flags= 0)  
             
     def check_bounds(self):    

@@ -4,7 +4,6 @@ Created on Aug 8, 2014
 @author: DemiCow
 '''
 import pygame 
-import math 
 import random 
 import squid
 import prepare
